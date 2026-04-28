@@ -11,102 +11,77 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
 <style>
-  /* =========================================================
-     PALETA & VARIÁVEIS
-     ========================================================= */
   :root {
-    /* Paleta UN INFO — extraída do site oficial uninfo.org */
-    --un-cyan:        #00B7E1;   /* cyan UN INFO — cor primária (logo, links, gráficos) */
-    --un-cyan-dark:   #0099C2;   /* cyan para hover / tab ativa */
-    --un-cyan-light:  #E6F7FC;   /* fundo subtil */
-    --un-cyan-bar:    #3FBDE6;   /* barras de gráficos */
-    --un-dark:        #1A2C3D;   /* texto principal / navy escuro */
-    --un-red:         #E2231A;   /* vermelho UN (alertas / banner IMPORTANT) */
-    /* Aliases (compatibilidade com o resto do CSS) */
-    --navy:           var(--un-dark);
-    --navy-dark:      #0E1A26;
-    --blue:           var(--un-cyan);
-    --blue-light:     var(--un-cyan-light);
-    --bg:             #F7FAFC;
-    --surface:        #FFFFFF;
-    --text:           #1F2937;
-    --text-soft:      #6B7280;
-    --border:         #E1E8F0;
-    --green:          #28A745;
-    --yellow:         #FFC107;
-    --red:            #DC3545;
-    --shadow:         0 1px 2px rgba(26,44,61,.04), 0 2px 8px rgba(26,44,61,.06);
-    --shadow-lg:      0 8px 24px rgba(26,44,61,.1);
-    --radius:         8px;
-
-    /* SDG colors oficiais — para tags e elementos */
-    --sdg-1:  #E5243B; --sdg-2:  #DDA63A; --sdg-3:  #4C9F38; --sdg-4:  #C5192D;
-    --sdg-5:  #FF3A21; --sdg-6:  #26BDE2; --sdg-7:  #FCC30B; --sdg-8:  #A21942;
-    --sdg-9:  #FD6925; --sdg-10: #DD1367; --sdg-11: #FD9D24; --sdg-12: #BF8B2E;
+    --un-cyan: #00B7E1;
+    --un-cyan-dark: #0099C2;
+    --un-cyan-light: #E6F7FC;
+    --un-dark: #1A2C3D;
+    --bg: #F7FAFC;
+    --surface: #FFFFFF;
+    --text: #1F2937;
+    --text-soft: #6B7280;
+    --border: #E1E8F0;
+    --green: #28A745;
+    --yellow: #FFC107;
+    --red: #DC3545;
+    --shadow: 0 1px 2px rgba(26,44,61,.04), 0 2px 8px rgba(26,44,61,.06);
+    --radius: 8px;
+    --sdg-1: #E5243B; --sdg-2: #DDA63A; --sdg-3: #4C9F38; --sdg-4: #C5192D;
+    --sdg-5: #FF3A21; --sdg-6: #26BDE2; --sdg-7: #FCC30B; --sdg-8: #A21942;
+    --sdg-9: #FD6925; --sdg-10: #DD1367; --sdg-11: #FD9D24; --sdg-12: #BF8B2E;
     --sdg-13: #3F7E44; --sdg-14: #0A97D9; --sdg-15: #56C02B; --sdg-16: #00689D;
     --sdg-17: #19486A;
   }
 
   * { box-sizing: border-box; }
-  html, body {
-    margin: 0; padding: 0;
+  body {
+    margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     background: var(--bg);
     color: var(--text);
     font-size: 14px;
-    line-height: 1.5;
   }
 
-  /* =========================================================
-     HEADER (estilo UN INFO)
-     ========================================================= */
   header.app-header {
     background: white;
-    color: var(--un-dark);
     padding: 14px 32px;
-    box-shadow: 0 1px 0 rgba(0,0,0,.05);
     display: flex;
     align-items: center;
     gap: 24px;
     border-top: 4px solid var(--un-cyan);
+    flex-wrap: wrap;
   }
-  header.app-header .brand { flex: 1; min-width: 0; }
+  header.app-header .brand { flex: 1; }
   header.app-header h1 {
-    margin: 0; font-size: 18px; font-weight: 600;
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
     color: var(--un-dark);
-    display: flex; align-items: center; gap: 10px;
   }
-  header.app-header h1 i { color: var(--un-cyan); }
   header.app-header h1 .un-info-mark {
-    display: inline-block;
     background: var(--un-cyan);
     color: white;
     padding: 3px 10px;
     border-radius: 4px;
-    font-weight: 700;
     font-size: 14px;
-    letter-spacing: .5px;
-    margin-right: 4px;
+    margin-right: 8px;
   }
   header.app-header .subtitle {
-    margin-top: 3px; font-size: 12px; color: var(--text-soft);
+    font-size: 12px;
+    color: var(--text-soft);
+    margin-top: 4px;
   }
-  /* Faixa colorida SDG (assinatura UN INFO) */
-  .sdg-stripe {
-    display: flex;
-    height: 6px;
-    width: 100%;
-  }
+  .sdg-stripe { display: flex; height: 6px; width: 100%; }
   .sdg-stripe span { flex: 1; }
-  .sdg-stripe span:nth-child(1)  { background: var(--sdg-1); }
-  .sdg-stripe span:nth-child(2)  { background: var(--sdg-2); }
-  .sdg-stripe span:nth-child(3)  { background: var(--sdg-3); }
-  .sdg-stripe span:nth-child(4)  { background: var(--sdg-4); }
-  .sdg-stripe span:nth-child(5)  { background: var(--sdg-5); }
-  .sdg-stripe span:nth-child(6)  { background: var(--sdg-6); }
-  .sdg-stripe span:nth-child(7)  { background: var(--sdg-7); }
-  .sdg-stripe span:nth-child(8)  { background: var(--sdg-8); }
-  .sdg-stripe span:nth-child(9)  { background: var(--sdg-9); }
+  .sdg-stripe span:nth-child(1) { background: var(--sdg-1); }
+  .sdg-stripe span:nth-child(2) { background: var(--sdg-2); }
+  .sdg-stripe span:nth-child(3) { background: var(--sdg-3); }
+  .sdg-stripe span:nth-child(4) { background: var(--sdg-4); }
+  .sdg-stripe span:nth-child(5) { background: var(--sdg-5); }
+  .sdg-stripe span:nth-child(6) { background: var(--sdg-6); }
+  .sdg-stripe span:nth-child(7) { background: var(--sdg-7); }
+  .sdg-stripe span:nth-child(8) { background: var(--sdg-8); }
+  .sdg-stripe span:nth-child(9) { background: var(--sdg-9); }
   .sdg-stripe span:nth-child(10) { background: var(--sdg-10); }
   .sdg-stripe span:nth-child(11) { background: var(--sdg-11); }
   .sdg-stripe span:nth-child(12) { background: var(--sdg-12); }
@@ -116,44 +91,29 @@
   .sdg-stripe span:nth-child(16) { background: var(--sdg-16); }
   .sdg-stripe span:nth-child(17) { background: var(--sdg-17); }
 
-  /* Upload compacto dentro do header */
-  .upload-mini {
-    display: flex; align-items: center; gap: 10px;
-    flex-shrink: 0;
-  }
-  .upload-mini .btn-upload {
-    display: inline-flex; align-items: center; gap: 8px;
+  .upload-mini { display: flex; align-items: center; gap: 10px; }
+  .btn-upload {
     padding: 8px 14px;
     background: var(--un-cyan);
     color: white;
-    border: 1px solid transparent;
+    border: none;
     border-radius: 6px;
     cursor: pointer;
     font-size: 13px;
-    font-weight: 500;
-    transition: background .15s, transform .1s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
   }
-  .upload-mini .btn-upload:hover { background: var(--un-cyan-dark); }
-  .upload-mini .btn-upload.dragover { background: var(--un-cyan-dark); transform: scale(1.03); }
-  .upload-mini input[type=file] { display: none; }
-  .upload-mini .file-info {
-    font-size: 12px;
-    color: var(--text-soft);
-    max-width: 280px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  .upload-mini .file-info i { color: var(--green); margin-right: 4px; }
+  .btn-upload:hover { background: var(--un-cyan-dark); }
+  .file-info { font-size: 12px; color: var(--text-soft); }
+  .file-info i { margin-right: 4px; }
+  .file-info.loading i { color: var(--un-cyan); animation: spin 1s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .file-info.error i { color: var(--red); }
+  .file-info.success i { color: var(--green); }
 
-  /* =========================================================
-     LAYOUT
-     ========================================================= */
   main { max-width: 1500px; margin: 0 auto; padding: 20px 32px 64px; }
 
-  /* =========================================================
-     TABS
-     ========================================================= */
   .tabs {
     display: flex;
     gap: 4px;
@@ -169,7 +129,6 @@
     font-weight: 500;
     color: var(--text-soft);
     border-bottom: 3px solid transparent;
-    margin-bottom: -2px;
     transition: all .2s;
   }
   .tab:hover { color: var(--un-cyan); }
@@ -182,9 +141,6 @@
   .tab-content { display: none; }
   .tab-content.active { display: block; }
 
-  /* =========================================================
-     FILTERS
-     ========================================================= */
   .filters {
     background: var(--surface);
     border-radius: var(--radius);
@@ -196,30 +152,24 @@
     gap: 16px;
     align-items: end;
   }
-  .filter-group { flex: 1; min-width: 220px; }
+  .filter-group { flex: 1; min-width: 200px; }
   .filter-group label {
-    display: block; font-size: 12px; font-weight: 600;
-    color: var(--text-soft); text-transform: uppercase;
-    letter-spacing: .5px; margin-bottom: 6px;
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--text-soft);
+    margin-bottom: 6px;
   }
-  .filter-group select, .filter-group input {
+  .filter-group select {
     width: 100%;
     padding: 10px 12px;
     border: 1px solid var(--border);
     border-radius: 8px;
-    font-size: 14px;
     background: white;
-    transition: border-color .2s, box-shadow .2s;
-  }
-  .filter-group select:focus, .filter-group input:focus {
-    outline: none;
-    border-color: var(--blue);
-    box-shadow: 0 0 0 3px rgba(74,123,157,.15);
+    font-size: 14px;
   }
 
-  /* =========================================================
-     CARDS DE RESUMO
-     ========================================================= */
   .summary-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -233,25 +183,13 @@
     box-shadow: var(--shadow);
     border-left: 4px solid var(--un-cyan);
   }
-  .summary-card .label {
-    font-size: 11px; font-weight: 600; text-transform: uppercase;
-    color: var(--text-soft); letter-spacing: .5px;
-  }
-  .summary-card .value {
-    font-size: 22px; font-weight: 700;
-    color: var(--un-dark); margin-top: 6px;
-    font-family: "SF Mono", Monaco, "Courier New", monospace;
-  }
-  .summary-card .sub {
-    font-size: 12px; color: var(--text-soft); margin-top: 4px;
-  }
+  .summary-card .label { font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--text-soft); }
+  .summary-card .value { font-size: 22px; font-weight: 700; color: var(--un-dark); margin-top: 6px; }
+  .summary-card .sub { font-size: 12px; color: var(--text-soft); margin-top: 4px; }
   .summary-card.green { border-left-color: var(--green); }
-  .summary-card.yellow { border-left-color: var(--yellow); }
   .summary-card.red { border-left-color: var(--red); }
+  .summary-card.yellow { border-left-color: var(--yellow); }
 
-  /* =========================================================
-     PAINEL (chart + tabela)
-     ========================================================= */
   .panel {
     background: var(--surface);
     border-radius: var(--radius);
@@ -263,15 +201,13 @@
     margin: 0 0 16px;
     font-size: 16px;
     color: var(--un-cyan-dark);
-    font-weight: 600;
-    display: flex; align-items: center; gap: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
-  .panel h2 i { color: var(--un-cyan); }
+
   .chart-container { position: relative; height: 320px; }
 
-  /* =========================================================
-     TABELA
-     ========================================================= */
   table.data {
     width: 100%;
     border-collapse: collapse;
@@ -282,88 +218,27 @@
     color: white;
     padding: 10px 12px;
     text-align: left;
-    font-weight: 600;
     font-size: 12px;
     text-transform: uppercase;
-    letter-spacing: .3px;
-    position: sticky; top: 0;
   }
   table.data tbody tr {
     border-bottom: 1px solid var(--border);
-    transition: background .15s, box-shadow .15s;
     cursor: pointer;
   }
-  table.data tbody tr:nth-child(even) { background: #FAFBFC; }
-  table.data tbody tr:hover {
-    background: var(--blue-light);
-    box-shadow: inset 4px 0 0 var(--un-blue);
-  }
-  table.data tbody tr td:first-child { position: relative; }
-  table.data tbody tr:hover td:first-child::after {
-    content: "\f105";
-    font-family: "Font Awesome 6 Free";
-    font-weight: 900;
-    position: absolute;
-    right: 4px; top: 50%;
-    transform: translateY(-50%);
-    color: var(--un-blue);
-    font-size: 12px;
-  }
-  table.data td {
-    padding: 10px 12px;
-    vertical-align: top;
-  }
-  table.data .num {
-    font-family: "SF Mono", Monaco, "Courier New", monospace;
-    text-align: right;
-    white-space: nowrap;
-  }
-  .desc-cell {
-    max-width: 320px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-  }
-  .delivery-cell {
-    max-width: 280px;
-    font-size: 12px;
-    color: var(--text-soft);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    cursor: help;
-  }
+  table.data tbody tr:hover { background: var(--un-cyan-light); }
+  table.data td { padding: 10px 12px; vertical-align: top; }
+  .num { text-align: right; font-family: monospace; white-space: nowrap; }
+  .delivery-cell { max-width: 260px; font-size: 12px; color: var(--text-soft); }
+  .desc-cell { max-width: 300px; }
 
-  /* Barra de % gasta */
-  .pct-cell { min-width: 140px; }
-  .pct-bar-wrap {
-    display: flex; align-items: center; gap: 8px;
-  }
-  .pct-bar {
-    flex: 1; height: 8px;
-    background: #E5E7EB;
-    border-radius: 4px;
-    overflow: hidden;
-  }
-  .pct-bar-fill {
-    height: 100%;
-    border-radius: 4px;
-    transition: width .4s ease;
-  }
-  .pct-num {
-    font-family: "SF Mono", Monaco, "Courier New", monospace;
-    font-size: 12px; font-weight: 600;
-    min-width: 48px; text-align: right;
-  }
-  .pct-low  { background: linear-gradient(90deg, #DC354580, var(--red)); }
-  .pct-mid  { background: linear-gradient(90deg, #FFC10780, var(--yellow)); }
-  .pct-high { background: linear-gradient(90deg, #28A74580, var(--green)); }
+  .pct-bar-wrap { display: flex; align-items: center; gap: 8px; min-width: 130px; }
+  .pct-bar { flex: 1; height: 8px; background: #E5E7EB; border-radius: 4px; overflow: hidden; }
+  .pct-bar-fill { height: 100%; border-radius: 4px; }
+  .pct-low { background: linear-gradient(90deg, #DC354580, #DC3545); }
+  .pct-mid { background: linear-gradient(90deg, #FFC10780, #FFC107); }
+  .pct-high { background: linear-gradient(90deg, #28A74580, #28A745); }
+  .pct-num { font-family: monospace; font-size: 12px; min-width: 48px; text-align: right; }
 
-  /* Status badges */
   .badge {
     display: inline-block;
     padding: 3px 10px;
@@ -371,176 +246,73 @@
     font-size: 11px;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: .3px;
   }
-  .badge.closed         { background: #D1FAE5; color: #065F46; }
+  .badge.closed { background: #D1FAE5; color: #065F46; }
   .badge.implementation { background: #DBEAFE; color: #1E40AF; }
-  .badge.finalisation   { background: #FEF3C7; color: #92400E; }
-  .badge.cancelled      { background: #FEE2E2; color: #991B1B; }
-  .badge.pipeline       { background: #E5E7EB; color: #374151; }
+  .badge.finalisation { background: #FEF3C7; color: #92400E; }
+  .badge.cancelled { background: #FEE2E2; color: #991B1B; }
+  .badge.pipeline { background: #E5E7EB; color: #374151; }
 
-  tr.cancelled { opacity: .55; }
-
-  /* =========================================================
-     FICHA DE PROJETO
-     ========================================================= */
-  .sp-banner {
-    background: linear-gradient(90deg, var(--un-cyan) 0%, var(--un-cyan-dark) 100%);
-    color: white;
-    padding: 16px 22px;
-    border-radius: var(--radius);
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 18px;
-    box-shadow: var(--shadow);
-  }
-  .sp-banner-code {
-    font-size: 22px;
-    font-weight: 700;
-    letter-spacing: .5px;
-    background: rgba(255,255,255,.18);
-    padding: 8px 16px;
-    border-radius: 6px;
-    min-width: 64px;
-    text-align: center;
-    flex-shrink: 0;
-    border: 1px solid rgba(255,255,255,.3);
-  }
-  .sp-banner-text {
-    font-size: 14px;
-    font-weight: 500;
-    line-height: 1.45;
-    flex: 1;
-  }
-
-  .project-detail {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
-  }
+  .project-detail { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
   .project-detail .full { grid-column: 1 / -1; }
-
   .info-block { margin-bottom: 18px; }
-  .info-block .label {
-    font-size: 11px; font-weight: 600; text-transform: uppercase;
-    color: var(--text-soft); letter-spacing: .5px; margin-bottom: 4px;
-  }
-  .info-block .value { font-size: 14px; line-height: 1.5; }
-  .info-block .value.title { font-size: 16px; font-weight: 600; color: var(--navy); }
-
+  .info-block .label { font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--text-soft); margin-bottom: 4px; }
   .tag {
     display: inline-block;
     padding: 4px 10px;
     margin: 2px 4px 2px 0;
     background: var(--un-cyan-light);
-    color: var(--un-cyan-dark);
     border-radius: 999px;
     font-size: 12px;
-    font-weight: 500;
   }
-  .tag.donor { background: #E8F5E9; color: #1B5E20; }
-  .tag.partner { background: #F3E5F5; color: #4A148C; }
-  .tag.priority { background: var(--un-cyan-light); color: var(--un-cyan-dark); }
-  .tag.sdg {
-    color: white;
-    font-weight: 600;
-    background: #888;
-  }
-  .tag.sdg[data-sdg="1"]  { background: var(--sdg-1); }
-  .tag.sdg[data-sdg="2"]  { background: var(--sdg-2); color: var(--un-dark); }
-  .tag.sdg[data-sdg="3"]  { background: var(--sdg-3); }
-  .tag.sdg[data-sdg="4"]  { background: var(--sdg-4); }
-  .tag.sdg[data-sdg="5"]  { background: var(--sdg-5); }
-  .tag.sdg[data-sdg="6"]  { background: var(--sdg-6); }
-  .tag.sdg[data-sdg="7"]  { background: var(--sdg-7); color: var(--un-dark); }
-  .tag.sdg[data-sdg="8"]  { background: var(--sdg-8); }
-  .tag.sdg[data-sdg="9"]  { background: var(--sdg-9); }
+  .tag.sdg { color: white; font-weight: 600; background: #888; }
+  .tag.sdg[data-sdg="1"] { background: var(--sdg-1); }
+  .tag.sdg[data-sdg="2"] { background: var(--sdg-2); color: black; }
+  .tag.sdg[data-sdg="3"] { background: var(--sdg-3); }
+  .tag.sdg[data-sdg="4"] { background: var(--sdg-4); }
+  .tag.sdg[data-sdg="5"] { background: var(--sdg-5); }
+  .tag.sdg[data-sdg="6"] { background: var(--sdg-6); }
+  .tag.sdg[data-sdg="7"] { background: var(--sdg-7); color: black; }
+  .tag.sdg[data-sdg="8"] { background: var(--sdg-8); }
+  .tag.sdg[data-sdg="9"] { background: var(--sdg-9); }
   .tag.sdg[data-sdg="10"] { background: var(--sdg-10); }
-  .tag.sdg[data-sdg="11"] { background: var(--sdg-11); color: var(--un-dark); }
-  .tag.sdg[data-sdg="12"] { background: var(--sdg-12); color: var(--un-dark); }
+  .tag.sdg[data-sdg="11"] { background: var(--sdg-11); color: black; }
+  .tag.sdg[data-sdg="12"] { background: var(--sdg-12); color: black; }
   .tag.sdg[data-sdg="13"] { background: var(--sdg-13); }
   .tag.sdg[data-sdg="14"] { background: var(--sdg-14); }
   .tag.sdg[data-sdg="15"] { background: var(--sdg-15); }
   .tag.sdg[data-sdg="16"] { background: var(--sdg-16); }
   .tag.sdg[data-sdg="17"] { background: var(--sdg-17); }
 
-  .pct-big {
-    margin: 8px 0;
-  }
-  .pct-big .pct-bar { height: 16px; }
-  .pct-big .pct-num { font-size: 18px; min-width: 60px; }
-
-  .actions {
-    display: flex; gap: 10px; margin-top: 16px;
-  }
+  .actions { display: flex; gap: 10px; margin-top: 16px; }
   .btn {
-    padding: 9px 16px;
+    padding: 8px 16px;
     border: 1px solid var(--un-cyan);
     background: white;
     color: var(--un-cyan-dark);
     border-radius: 6px;
-    font-size: 13px;
-    font-weight: 500;
     cursor: pointer;
-    transition: all .15s;
-    display: inline-flex; align-items: center; gap: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
   }
-  .btn:hover { background: var(--un-cyan-light); }
-  .btn.primary { background: var(--un-cyan); color: white; border-color: var(--un-cyan); }
-  .btn.primary:hover { background: var(--un-cyan-dark); border-color: var(--un-cyan-dark); }
+  .btn.primary { background: var(--un-cyan); color: white; border: none; }
+  .empty { text-align: center; padding: 48px; color: var(--text-soft); }
+  .empty i { font-size: 48px; opacity: 0.3; margin-bottom: 12px; }
 
-  /* =========================================================
-     EMPTY STATE
-     ========================================================= */
-  .empty {
-    text-align: center;
-    padding: 48px 24px;
-    color: var(--text-soft);
-  }
-  .empty i { font-size: 48px; opacity: .3; margin-bottom: 12px; }
-  .empty p { margin: 4px 0; }
+  table.years { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 8px; }
+  table.years th, table.years td { padding: 8px 6px; border-bottom: 1px solid var(--border); text-align: right; }
+  table.years td.year-label { text-align: left; font-weight: 600; }
 
-  /* =========================================================
-     MULTI-YEAR TABLE
-     ========================================================= */
-  table.years {
-    width: 100%; border-collapse: collapse;
-    font-size: 12px; margin-top: 8px;
-  }
-  table.years th, table.years td {
-    padding: 8px 10px;
-    border-bottom: 1px solid var(--border);
-    text-align: right;
-    font-family: "SF Mono", Monaco, monospace;
-  }
-  table.years th {
-    background: var(--blue-light);
-    color: var(--navy);
-    font-weight: 600;
-    text-align: center;
-  }
-  table.years td.year-label {
-    text-align: left; font-weight: 600;
-    font-family: -apple-system, sans-serif;
-  }
-  .narr-icon {
-    color: var(--blue); cursor: help; margin-left: 6px;
-  }
-
-  /* Print */
-  @media print {
-    header.app-header, .sdg-stripe, .tabs, .filters, .actions, .file-info, .upload-mini { display: none !important; }
-    main { padding: 0; }
-    .panel { box-shadow: none; border: 1px solid var(--border); page-break-inside: avoid; }
-    .sp-banner { background: var(--un-cyan-dark) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  }
-
-  /* Responsive */
   @media (max-width: 768px) {
     main { padding: 16px; }
     .project-detail { grid-template-columns: 1fr; }
     .filters { flex-direction: column; align-items: stretch; }
+    header.app-header { flex-direction: column; align-items: stretch; }
+  }
+
+  @media print {
+    header, .sdg-stripe, .tabs, .filters, .actions, .upload-mini { display: none; }
   }
 </style>
 </head>
@@ -548,186 +320,139 @@
 
 <header class="app-header">
   <div class="brand">
-    <h1><span class="un-info-mark">UN INFO</span> Cabo Verde — Dashboard de Projetos</h1>
-    <div class="subtitle">Relatórios por Focal Point e por Projeto · UNSDCF 2023–2027</div>
+    <h1><span class="un-info-mark">UN INFO</span> Cabo Verde — Dashboard</h1>
+    <div class="subtitle">Relatórios por Focal Point e Projeto · UNSDCF 2023–2027</div>
   </div>
-  <div class="upload-mini" id="dropZone">
-    <span class="file-info" id="fileInfo"><i class="fa-solid fa-spinner fa-pulse"></i> A carregar dados do GitHub...</span>
-    <label class="btn-upload" for="fileInput" id="uploadBtn">
-      <i class="fa-solid fa-file-csv"></i> Carregar CSV
+  <div class="upload-mini">
+    <span class="file-info" id="fileInfo"><i class="fa-solid fa-spinner fa-pulse"></i> A carregar...</span>
+    <label class="btn-upload" for="fileInput">
+      <i class="fa-solid fa-file-csv"></i> Outro CSV
     </label>
-    <input type="file" id="fileInput" accept=".csv" />
+    <input type="file" id="fileInput" accept=".csv" style="display:none" />
   </div>
 </header>
-<!-- Faixa colorida com as 17 cores oficiais dos SDGs (assinatura UN INFO) -->
-<div class="sdg-stripe" aria-hidden="true">
-  <span></span><span></span><span></span><span></span><span></span>
-  <span></span><span></span><span></span><span></span><span></span>
-  <span></span><span></span><span></span><span></span><span></span>
-  <span></span><span></span>
-</div>
+<div class="sdg-stripe"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
 
 <main>
-
-  <!-- TABS -->
   <div class="tabs">
-    <button class="tab active" data-tab="focal">
-      <i class="fa-solid fa-user-tie"></i>Por Focal Point
-    </button>
-    <button class="tab" data-tab="project">
-      <i class="fa-solid fa-folder-open"></i>Por Projeto
-    </button>
+    <button class="tab active" data-tab="focal"><i class="fa-solid fa-user-tie"></i> Por Focal Point</button>
+    <button class="tab" data-tab="project"><i class="fa-solid fa-folder-open"></i> Por Projeto</button>
   </div>
 
-  <!-- TAB 1 — FOCAL POINT -->
   <div class="tab-content active" id="tab-focal">
     <div class="filters">
-      <div class="filter-group">
-        <label>Focal Point</label>
-        <select id="focalSelect">
-          <option value="">— Selecione um focal point —</option>
-        </select>
-      </div>
-      <div class="filter-group">
-        <label>Ano</label>
-        <select id="yearSelect">
-          <option value="all">Todos os anos (2023–2026)</option>
-          <option value="2023">2023</option>
-          <option value="2024">2024</option>
-          <option value="2025">2025</option>
-          <option value="2026">2026</option>
-        </select>
-      </div>
-      <div class="filter-group">
-        <label>Status</label>
-        <select id="statusSelect">
-          <option value="all">Todos</option>
-          <option value="Implementation">Implementation</option>
-          <option value="Finalisation">Finalisation</option>
-          <option value="Closed">Closed</option>
-          <option value="Pipeline">Pipeline</option>
-          <option value="Cancelled">Cancelled</option>
-        </select>
-      </div>
+      <div class="filter-group"><label>Focal Point</label><select id="focalSelect"><option value="">— Selecione —</option></select></div>
+      <div class="filter-group"><label>Ano</label><select id="yearSelect"><option value="all">Todos os anos</option><option value="2023">2023</option><option value="2024">2024</option><option value="2025">2025</option><option value="2026">2026</option></select></div>
+      <div class="filter-group"><label>Status</label><select id="statusSelect"><option value="all">Todos</option><option value="Implementation">Implementation</option><option value="Finalisation">Finalisation</option><option value="Closed">Closed</option><option value="Pipeline">Pipeline</option><option value="Cancelled">Cancelled</option></select></div>
     </div>
-
-    <div id="focalEmpty" class="empty">
-      <i class="fa-solid fa-arrow-up"></i>
-      <p>Carrega o CSV e seleciona um Focal Point para começar.</p>
-    </div>
-
+    <div id="focalEmpty" class="empty" style="display:none;"><i class="fa-solid fa-arrow-up"></i><p>Selecione um Focal Point para começar.</p></div>
     <div id="focalReport" style="display:none;">
       <div class="summary-grid" id="summaryCards"></div>
-      <div class="panel">
-        <h2><i class="fa-solid fa-chart-bar"></i> Taxa de execução por projeto (% gasta)</h2>
-        <div class="chart-container">
-          <canvas id="pctChart"></canvas>
-        </div>
-      </div>
-      <div class="panel">
-        <h2><i class="fa-solid fa-list"></i> Projetos do Focal Point</h2>
-        <div style="overflow-x:auto;">
-          <table class="data" id="projectTable">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Descrição</th>
-                <th>Status</th>
-                <th>Delivery até ao momento</th>
-                <th class="num">Required</th>
-                <th class="num">Available</th>
-                <th class="num">Gasto</th>
-                <th>% Gasta</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </div>
+      <div class="panel"><h2><i class="fa-solid fa-chart-bar"></i> % Gasta por projeto</h2><div class="chart-container"><canvas id="pctChart"></canvas></div></div>
+      <div class="panel"><h2><i class="fa-solid fa-list"></i> Projetos</h2><div style="overflow-x:auto;"><table class="data" id="projectTable"><thead><tr><th>ID</th><th>Descrição</th><th>Status</th><th>Delivery</th><th class="num">Required</th><th class="num">Available</th><th class="num">Gasto</th><th>% Gasta</th></tr></thead><tbody></tbody></table></div></div>
     </div>
   </div>
 
-  <!-- TAB 2 — PROJETO INDIVIDUAL -->
   <div class="tab-content" id="tab-project">
     <div class="filters">
-      <div class="filter-group" style="flex: 2;">
-        <label>Selecionar Projeto</label>
-        <select id="projectSelect">
-          <option value="">— Carrega o CSV primeiro —</option>
-        </select>
-      </div>
-      <div class="filter-group">
-        <label>Pesquisar por ID</label>
-        <input type="text" id="projectSearch" placeholder="ex: 108631" />
-      </div>
+      <div class="filter-group" style="flex:2;"><label>Projeto</label><select id="projectSelect"><option value="">— Selecione —</option></select></div>
+      <div class="filter-group"><label>Pesquisar ID</label><input type="text" id="projectSearch" placeholder="ex: 108631" /></div>
     </div>
-
-    <div id="projectEmpty" class="empty">
-      <i class="fa-solid fa-folder-open"></i>
-      <p>Seleciona um projeto para ver a ficha completa.</p>
-    </div>
-
+    <div id="projectEmpty" class="empty"><i class="fa-solid fa-folder-open"></i><p>Selecione um projeto para ver a ficha completa.</p></div>
     <div id="projectDetail" class="panel" style="display:none;"></div>
   </div>
 </main>
 
 <script>
-/* =========================================================
-   ESTADO GLOBAL
-   ========================================================= */
+// ============================================================
+// DADOS DEMONSTRATIVOS (FALLBACK CASE O CSV NÃO CARREGUE)
+// ============================================================
+const DEMO_DATA = [
+  { ID:"108631", Description:"Apoio à formação de imigrantes", Status:"Closed", StartDate:"2023-01-01", EndDate:"2024-12-31", Agencies:"IOM", FocalUsers:["Sara Brigham"], ContributingPartners:["IOM Development Fund"], ImplementationPartners:["AAI","CM Praia"], SDGGoals:["4 Quality Education","8 Decent Jobs"], StrategicPriority:"Transformação Económica Inclusiva", StrategicPriorityCode:"SP 2", Geography:"Cabo Verde (Praia)", TotalRequired:109422, TotalAvailable:109422, TotalExpenditure:75497, years:{2023:{required:85000,available:85000,expenditure:62169,narrative:"Salas criadas"},2024:{required:24422,available:24422,expenditure:13328,narrative:"Incubação iniciada"},2025:{required:0,available:0,expenditure:0,narrative:""},2026:{required:0,available:0,expenditure:0,narrative:""}} },
+  { ID:"108554", Description:"Projeto OYA - empregabilidade jovem", Status:"Closed", StartDate:"2023-01-01", EndDate:"2023-12-31", Agencies:"UNDP", FocalUsers:["Katya Mascarenhas Neves","Edson Fernandes"], ContributingPartners:["Core Funding"], ImplementationPartners:["MAA","MICE"], SDGGoals:["1 No Poverty","8 Decent Jobs"], StrategicPriority:"Transformação Económica", StrategicPriorityCode:"SP 2", Geography:"Cabo Verde", TotalRequired:80000, TotalAvailable:80000, TotalExpenditure:20486, years:{2023:{required:80000,available:80000,expenditure:20486,narrative:"Diagnóstico inicial"},2024:{required:0,available:0,expenditure:0,narrative:""},2025:{required:0,available:0,expenditure:0,narrative:""},2026:{required:0,available:0,expenditure:0,narrative:""}} },
+  { ID:"108676", Description:"Reforço de instituições em direitos humanos", Status:"Closed", StartDate:"2023-03-01", EndDate:"2024-12-31", Agencies:"UNDP/UNFPA/UNICEF", FocalUsers:["Frederic Mbassa","Ulrike Mbuton"], ContributingPartners:["Core Funding"], ImplementationPartners:["CNDHC","Ministry of Justice"], SDGGoals:["16 Peace and Justice"], StrategicPriority:"Governança e Estado de Direito", StrategicPriorityCode:"SP 3", Geography:"Cabo Verde", TotalRequired:312000, TotalAvailable:292000, TotalExpenditure:292000, years:{2023:{required:105000,available:85000,expenditure:85000,narrative:"Capacitação de magistrados"},2024:{required:207000,available:207000,expenditure:207000,narrative:"Plano nacional lançado"},2025:{required:0,available:0,expenditure:0,narrative:""},2026:{required:0,available:0,expenditure:0,narrative:""}} }
+];
+
 let DATA = [];
-let FOCAL_USERS = [];
 let pctChart = null;
+const YEARS = [2023,2024,2025,2026];
 
-const YEARS = [2023, 2024, 2025, 2026];
+function num(v) { const n = parseFloat(String(v).replace(/[^\d.-]/g,'')); return isNaN(n)?0:n; }
+function fmtMoney(v) { if (!v && v!==0) return '--'; return v.toLocaleString('pt-PT',{maximumFractionDigits:0}); }
+function fmtPct(v) { return isFinite(v)?v.toFixed(1)+'%':'--'; }
+function pctClass(p) { if(p<40) return 'pct-low'; if(p<75) return 'pct-mid'; return 'pct-high'; }
+function escapeHtml(s) { if(!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function splitMulti(s) { if(!s) return []; return String(s).split(/;|,/).map(x=>x.trim()).filter(Boolean); }
+function statusBadge(s) { const cls = (s||'').toLowerCase().replace(/\s+/g,''); return `<span class="badge ${cls}">${escapeHtml(s||'--')}</span>`; }
 
-/* =========================================================
-   UTILS
-   ========================================================= */
-function num(v) {
-  if (v === null || v === undefined) return 0;
-  const n = parseFloat(String(v).replace(/[^\d.-]/g, ''));
-  return isNaN(n) ? 0 : n;
-}
-function fmtMoney(v) {
-  if (!v && v !== 0) return '--';
-  return v.toLocaleString('pt-PT', { maximumFractionDigits: 0 });
-}
-function fmtPct(v) {
-  if (!isFinite(v)) return '--';
-  return v.toFixed(1) + '%';
-}
-function pctClass(p) {
-  if (p < 40) return 'pct-low';
-  if (p < 75) return 'pct-mid';
-  return 'pct-high';
-}
-function statusBadge(s) {
-  if (!s) return '<span class="badge pipeline">--</span>';
-  const cls = s.toLowerCase().replace(/\s+/g, '');
-  return `<span class="badge ${cls}">${s}</span>`;
-}
-function splitMulti(s) {
-  if (!s) return [];
-  return String(s).split(/;|,/).map(x => x.trim()).filter(Boolean);
-}
-function escapeHtml(s) {
-  if (s == null) return '';
-  return String(s)
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;').replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
+function populateFilters() {
+  const fs = document.getElementById('focalSelect');
+  const focals = [...new Set(DATA.flatMap(p=>p.FocalUsers))].sort();
+  fs.innerHTML = '<option value="">— Selecione um focal point —</option>' + focals.map(f=>`<option value="${escapeHtml(f)}">${escapeHtml(f)}</option>`).join('');
+  const ps = document.getElementById('projectSelect');
+  ps.innerHTML = '<option value="">— Selecione um projeto —</option>' + DATA.map(p=>`<option value="${escapeHtml(p.ID)}">${escapeHtml(p.ID)} — ${escapeHtml(p.Description.slice(0,60))}</option>`).join('');
 }
 
-/* =========================================================
-   CARREGAR CSV DO GITHUB (FIXO)
-   ========================================================= */
+function renderFocalReport() {
+  const focal = document.getElementById('focalSelect').value;
+  const year = document.getElementById('yearSelect').value;
+  const status = document.getElementById('statusSelect').value;
+  if(!focal || DATA.length===0) { document.getElementById('focalEmpty').style.display='block'; document.getElementById('focalReport').style.display='none'; return; }
+  let projects = DATA.filter(p=>p.FocalUsers.includes(focal));
+  if(status!=='all') projects = projects.filter(p=>p.Status===status);
+  const rows = projects.map(p=>{
+    let req,avail,exp,delivery;
+    if(year==='all'){ req=p.TotalRequired; avail=p.TotalAvailable; exp=p.TotalExpenditure; delivery=YEARS.filter(y=>p.years[y].narrative).map(y=>`[${y}] ${p.years[y].narrative}`).join(' '); }
+    else{ const y=parseInt(year); req=p.years[y].required; avail=p.years[y].available; exp=p.years[y].expenditure; delivery=p.years[y].narrative||''; }
+    const pct=avail>0?(exp/avail)*100:0;
+    return {p,req,avail,exp,pct,delivery};
+  });
+  const totals = rows.reduce((a,r)=>({req:a.req+r.req,avail:a.avail+r.avail,exp:a.exp+r.exp}),{req:0,avail:0,exp:0});
+  const overallPct = totals.avail>0?(totals.exp/totals.avail)*100:0;
+  document.getElementById('summaryCards').innerHTML = `
+    <div class="summary-card"><div class="label"><i class="fa-solid fa-folder"></i> Projetos</div><div class="value">${rows.length}</div><div class="sub">${escapeHtml(focal)}</div></div>
+    <div class="summary-card"><div class="label">Required</div><div class="value">${fmtMoney(totals.req)}</div><div class="sub">USD</div></div>
+    <div class="summary-card"><div class="label">Available</div><div class="value">${fmtMoney(totals.avail)}</div><div class="sub">USD</div></div>
+    <div class="summary-card green"><div class="label">Gasto</div><div class="value">${fmtMoney(totals.exp)}</div><div class="sub">USD</div></div>
+    <div class="summary-card ${overallPct<40?'red':overallPct<75?'yellow':'green'}"><div class="label">Execução global</div><div class="value">${fmtPct(overallPct)}</div><div class="sub">média ponderada</div></div>
+  `;
+  const tbody = document.querySelector('#projectTable tbody');
+  if(rows.length===0) tbody.innerHTML='<tr><td colspan="8" style="text-align:center">Sem projetos</td></tr>';
+  else tbody.innerHTML = rows.map(({p,req,avail,exp,pct,delivery})=>`<tr data-id="${escapeHtml(p.ID)}"><td><strong>${escapeHtml(p.ID)}</strong></td><td class="desc-cell">${escapeHtml(p.Description)}</td><td>${statusBadge(p.Status)}</td><td class="delivery-cell">${escapeHtml(delivery)||'--'}</td><td class="num">${fmtMoney(req)}</td><td class="num">${fmtMoney(avail)}</td><td class="num">${fmtMoney(exp)}</td><td class="pct-cell"><div class="pct-bar-wrap"><div class="pct-bar"><div class="pct-bar-fill ${pctClass(pct)}" style="width:${Math.min(100,pct)}%"></div></div><span class="pct-num">${fmtPct(pct)}</span></div></td></tr>`).join('');
+  if(pctChart) pctChart.destroy();
+  const sorted = [...rows].sort((a,b)=>b.pct-a.pct);
+  pctChart = new Chart(document.getElementById('pctChart'),{type:'bar',data:{labels:sorted.map(r=>r.p.ID),datasets:[{label:'% Gasta',data:sorted.map(r=>Math.min(100,r.pct)),backgroundColor:'#3FBDE6',borderRadius:4}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,max:100,ticks:{callback:v=>v+'%'}}}}});
+  document.getElementById('focalEmpty').style.display='none'; document.getElementById('focalReport').style.display='block';
+}
+
+function renderProjectDetail(id) {
+  const p = DATA.find(x=>x.ID===id);
+  if(!p){ document.getElementById('projectEmpty').style.display='block'; document.getElementById('projectDetail').style.display='none'; return; }
+  const pct = p.TotalAvailable>0?(p.TotalExpenditure/p.TotalAvailable)*100:0;
+  const yearsTable = `<table class="years"><thead><tr><th>Ano</th><th>Required</th><th>Available</th><th>Expenditure</th><th>%</th><th>Narrativa</th></tr></thead><tbody>${YEARS.map(y=>{const yp=p.years[y]; const ypct=yp.available>0?(yp.expenditure/yp.available)*100:0; return `<tr><td class="year-label">${y}</td><td>${fmtMoney(yp.required)}</td><td>${fmtMoney(yp.available)}</td><td>${fmtMoney(yp.expenditure)}</td><td>${fmtMoney(yp.available>0?ypct:0)}%</td><td style="text-align:left">${escapeHtml(yp.narrative)||'--'}</td></tr>`;}).join('')}</tbody></table>`;
+  document.getElementById('projectDetail').innerHTML = `
+    <div style="background:var(--un-cyan);color:white;padding:16px;border-radius:8px;margin-bottom:20px;display:flex;align-items:center;gap:16px"><div style="background:rgba(255,255,255,.2);padding:8px 16px;border-radius:6px">${escapeHtml(p.StrategicPriorityCode||'—')}</div><div>${escapeHtml(p.StrategicPriority||'Prioridade não definida')}</div></div>
+    <div class="project-detail"><div><div class="info-block"><div class="label">ID</div><div class="value" style="font-size:18px;font-weight:700">${escapeHtml(p.ID)}</div></div><div class="info-block"><div class="label">Descrição</div><div class="value">${escapeHtml(p.Description)}</div></div><div class="info-block"><div class="label">Status</div><div class="value">${statusBadge(p.Status)}</div></div><div class="info-block"><div class="label">Período</div><div class="value">${escapeHtml(p.StartDate)} → ${escapeHtml(p.EndDate)}</div></div><div class="info-block"><div class="label">Focal Users</div><div class="value">${p.FocalUsers.map(u=>`<span class="tag">${escapeHtml(u)}</span>`).join('')||'--'}</div></div><div class="info-block"><div class="label">Agências</div><div class="value">${escapeHtml(p.Agencies)||'--'}</div></div><div class="info-block"><div class="label">Geografia</div><div class="value">${escapeHtml(p.Geography)||'--'}</div></div></div>
+    <div><div class="info-block"><div class="label">Financeiro (USD)</div><div class="summary-grid" style="margin-top:8px;grid-template-columns:repeat(3,1fr)"><div class="summary-card"><div class="label">Required</div><div class="value" style="font-size:18px">${fmtMoney(p.TotalRequired)}</div></div><div class="summary-card"><div class="label">Available</div><div class="value" style="font-size:18px">${fmtMoney(p.TotalAvailable)}</div></div><div class="summary-card green"><div class="label">Gasto</div><div class="value" style="font-size:18px">${fmtMoney(p.TotalExpenditure)}</div></div></div></div><div class="info-block"><div class="label">Execução global</div><div class="pct-bar-wrap"><div class="pct-bar"><div class="pct-bar-fill ${pctClass(pct)}" style="width:${Math.min(100,pct)}%"></div></div><span class="pct-num">${fmtPct(pct)}</span></div></div><div class="info-block"><div class="label">Detalhe anual</div>${yearsTable}</div></div>
+    <div class="full"><div class="info-block"><div class="label">Doadores</div><div class="value">${p.ContributingPartners.map(d=>`<span class="tag">${escapeHtml(d)}</span>`).join('')||'--'}</div></div><div class="info-block"><div class="label">Parceiros</div><div class="value">${p.ImplementationPartners.map(d=>`<span class="tag">${escapeHtml(d)}</span>`).join('')||'--'}</div></div><div class="info-block"><div class="label">SDGs</div><div class="value">${p.SDGGoals.map(s=>{const m=s.match(/^(\d{1,2})/); return `<span class="tag sdg" data-sdg="${m?m[1]:''}">${escapeHtml(s)}</span>`;}).join('')||'--'}</div></div><div class="actions"><button class="btn primary" onclick="window.print()"><i class="fa-solid fa-print"></i> Exportar PDF</button><button class="btn" onclick="copySummary('${escapeHtml(p.ID)}')"><i class="fa-solid fa-copy"></i> Copiar resumo</button></div></div></div>`;
+  document.getElementById('projectEmpty').style.display='none'; document.getElementById('projectDetail').style.display='block';
+}
+function copySummary(id){ const p=DATA.find(x=>x.ID===id); if(!p)return; const pct=p.TotalAvailable>0?(p.TotalExpenditure/p.TotalAvailable)*100:0; const txt=`PROJETO ${p.ID}\n${p.Description}\nStatus:${p.Status}\nFocal:${p.FocalUsers.join(', ')}\nRequired:${fmtMoney(p.TotalRequired)} Available:${fmtMoney(p.TotalAvailable)} Gasto:${fmtMoney(p.TotalExpenditure)} (${fmtPct(pct)})\nDoadores:${p.ContributingPartners.join('; ')}\nSDGs:${p.SDGGoals.join('; ')}`; navigator.clipboard.writeText(txt).then(()=>alert('Resumo copiado!'));
+}
+
+// ============================================================
+// CARREGAMENTO DO CSV DO GITHUB
+// ============================================================
 const CSV_URL = 'https://raw.githubusercontent.com/silvasofiacv/UN-INFO-CABO-VERDE/main/export_2026-04-28.csv';
+const fileInfo = document.getElementById('fileInfo');
 
-function carregarCSVdoGitHub() {
+function carregarCSV() {
+  fileInfo.innerHTML = '<i class="fa-solid fa-spinner fa-pulse"></i> A carregar dados do GitHub...';
+  fileInfo.className = 'file-info loading';
+  
   fetch(CSV_URL)
     .then(response => {
-      if (!response.ok) throw new Error('CSV não encontrado no GitHub');
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
       return response.text();
     })
     .then(csvText => {
@@ -736,58 +461,70 @@ function carregarCSVdoGitHub() {
         skipEmptyLines: true,
         transformHeader: h => h.trim(),
         complete: (res) => {
-          DATA = res.data
-            .filter(r => r.ID && String(r.ID).trim() !== '')
-            .map(r => ({
-              ID: String(r.ID).trim(),
-              Description: (r.Description || '').trim(),
-              Status: (r.Status || '').trim(),
-              StartDate: (r['Start date'] || '').trim(),
-              EndDate: (r['End date'] || '').trim(),
-              Agencies: (r.Agencies || '').trim(),
-              AgencyAbbr: (r['Agency abbreviations'] || '').trim(),
-              FocalUsers: splitMulti(r['Focal users']),
-              ContributingPartners: splitMulti(r['Contributing partners']),
-              ImplementationPartners: splitMulti(r['Implementation partners']),
-              SDGGoals: splitMulti(r['SDG Goals']),
-              StrategicPriority: (r['Strategic priority'] || '').trim(),
-              StrategicPriorityCode: (r['Strategic priority code'] || '').trim(),
-              OutcomeCode: (r['Outcome code'] || '').trim(),
-              OutputCode: (r['Output code'] || '').trim(),
-              Geography: (r.Geography || '').trim(),
-              TotalRequired: num(r['Total required resources']),
-              TotalAvailable: num(r['Total available resources']),
-              TotalExpenditure: num(r['Total expenditure resources']),
-              years: Object.fromEntries(YEARS.map(y => [y, {
-                required: num(r[`${y} Required`]),
-                available: num(r[`${y} Available`]),
-                expenditure: num(r[`${y} Expenditure`]),
-                narrative: (r[`${y} Narrative`] || '').trim()
-              }]))
-            }));
+          const parsed = res.data.filter(r => r.ID && String(r.ID).trim() !== '');
+          if (parsed.length === 0) throw new Error('CSV vazio');
           
-          const set = new Set();
-          DATA.forEach(p => p.FocalUsers.forEach(u => set.add(u)));
-          FOCAL_USERS = Array.from(set).sort((a,b) => a.localeCompare(b, 'pt'));
+          DATA = parsed.map(r => ({
+            ID: String(r.ID).trim(),
+            Description: (r.Description || '').trim(),
+            Status: (r.Status || '').trim(),
+            StartDate: (r['Start date'] || '').trim(),
+            EndDate: (r['End date'] || '').trim(),
+            Agencies: (r.Agencies || '').trim(),
+            FocalUsers: splitMulti(r['Focal users']),
+            ContributingPartners: splitMulti(r['Contributing partners']),
+            ImplementationPartners: splitMulti(r['Implementation partners']),
+            SDGGoals: splitMulti(r['SDG Goals']),
+            StrategicPriority: (r['Strategic priority'] || '').trim(),
+            StrategicPriorityCode: (r['Strategic priority code'] || '').trim(),
+            Geography: (r.Geography || '').trim(),
+            TotalRequired: num(r['Total required resources']),
+            TotalAvailable: num(r['Total available resources']),
+            TotalExpenditure: num(r['Total expenditure resources']),
+            years: Object.fromEntries(YEARS.map(y => [y, {
+              required: num(r[`${y} Required`]),
+              available: num(r[`${y} Available`]),
+              expenditure: num(r[`${y} Expenditure`]),
+              narrative: (r[`${y} Narrative`] || '').trim()
+            }]))
+          }));
           
+          fileInfo.innerHTML = `<i class="fa-solid fa-circle-check"></i> GitHub: ${DATA.length} projetos carregados`;
+          fileInfo.className = 'file-info success';
           populateFilters();
-          
-          const fi = document.getElementById('fileInfo');
-          fi.innerHTML = `<i class="fa-solid fa-circle-check"></i> Dados do GitHub · ${DATA.length} projetos`;
-          
-          // Atualiza a tabela se já houver um focal point selecionado
-          const focalSelect = document.getElementById('focalSelect');
-          if (focalSelect.value) renderFocalReport();
-        }
+          document.getElementById('focalEmpty').style.display = 'block';
+          document.getElementById('focalReport').style.display = 'none';
+        },
+        error: (err) => { throw new Error(err.message); }
       });
     })
     .catch(error => {
-      console.error('Erro ao carregar CSV:', error);
-      document.getElementById('fileInfo').innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Erro ao carregar ficheiro do GitHub';
+      console.warn('Erro ao carregar CSV do GitHub:', error);
+      fileInfo.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> GitHub não encontrado - usando dados demo`;
+      fileInfo.className = 'file-info error';
+      // Fallback para dados demo
+      DATA = JSON.parse(JSON.stringify(DEMO_DATA));
+      populateFilters();
+      document.getElementById('focalEmpty').style.display = 'block';
+      document.getElementById('focalReport').style.display = 'none';
     });
 }
 
-function populateFilters() {
-  const fs = document.getElementById('focalSelect');
-  fs.innerHTML = '<option value="">— Selecione um focal point —</option>' +
-    FOCAL_USERS.map(u => `<option value="${escapeHtml
+// ============================================================
+// EVENTOS
+// ============================================================
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click',()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(x=>x.classList.remove('active'));
+  t.classList.add('active');
+  document.getElementById('tab-'+t.dataset.tab).classList.add('active');
+}));
+['focalSelect','yearSelect','statusSelect'].forEach(id=>document.getElementById(id)?.addEventListener('change',renderFocalReport));
+document.getElementById('projectSelect')?.addEventListener('change',e=>{if(e.target.value) renderProjectDetail(e.target.value);});
+document.getElementById('projectSearch')?.addEventListener('input',e=>{const id=e.target.value.trim(); const p=DATA.find(x=>x.ID===id); if(p){ document.getElementById('projectSelect').value=id; renderProjectDetail(id); }});
+document.getElementById('projectTable')?.addEventListener('click',e=>{const tr=e.target.closest('tr[data-id]'); if(tr){ const id=tr.dataset.id; document.querySelector('.tab[data-tab="project"]').click(); document.getElementById('projectSelect').value=id; renderProjectDetail(id); }});
+document.getElementById('fileInput')?.addEventListener('change',e=>{if(e.target.files[0]){Papa.parse(e.target.files[0],{header:true,skipEmptyLines:true,complete:res=>{/*processar CSV carregado manualmente*/}});}});
+carregarCSV();
+</script>
+</body>
+</html>
