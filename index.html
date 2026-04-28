@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>UNINFO Cabo Verde — Dashboard de Projetos</title>
+
+<!-- CDNs -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<style>
+  /* =========================================================
+     PALETA & VARIÁVEIS
+     ========================================================= */
+  :root {
+    /* Paleta UN INFO — UN Blue oficial */
+    --un-blue:        #418FDE;   /* UN Blue (Pantone 279) — cor primária */
+    --un-blue-dark:   #1F4E8C;   /* azul institucional escuro */
+    --un-blue-darker: #0B2545;   /* navy para textos / header */
+    --un-blue-light:  #DCE9F8;   /* fundo subtil */
+    --un-cyan:        #009EDB;   /* UN classic accent */
+    /* Aliases (compatibilidade com o resto do CSS) */
+    --navy:           var(--un-blue-darker);
+    --navy-dark:      #061830;
+    --blue:           var(--un-blue);
+    --blue-light:     var(--un-blue-light);
+    --bg:             #F4F7FB;
+    --surface:        #FFFFFF;
+    --text:           #1F2937;
+    --text-soft:      #6B7280;
+    --border:         #E1E8F0;
+    --green:          #28A745;
+    --yellow:         #FFC107;
+    --red:            #DC3545;
+    --shadow:         0 1px 2px rgba(11,37,69,.04), 0 2px 8px rgba(11,37,69,.06);
+    --shadow-lg:      0 8px 24px rgba(11,37,69,.1);
+    --radius:         10px;
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* =========================================================
+     HEADER
+     ========================================================= */
+  header.app-header {
+    background: var(--un-blue-darker);
+    color: white;
+    padding: 14px 32px;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    border-bottom: 4px solid var(--un-blue);
+  }
+  header.app-header .brand {
+    flex: 1; min-width: 0;
+  }
+  header.app-header h1 {
+    margin: 0; font-size: 18px; font-weight: 600;
+    display: flex; align-items: center; gap: 10px;
+  }
+  header.app-header h1 i { color: var(--un-blue); }
+  header.app-header .subtitle {
+    margin-top: 2px; font-size: 12px; opacity: .8;
+  }
+  /* Upload compacto dentro do header */
+  .upload-mini {
+    display: flex; align-items: center; gap: 10px;
+    flex-shrink: 0;
+  }
+  .upload-mini .btn-upload {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 14px;
+    background: var(--un-blue);
+    color: white;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: background .15s, transform .1s;
+  }
+  .upload-mini .btn-upload:hover { background: var(--un-cyan); }
+  .upload-mini .btn-upload.dragover { background: var(--un-cyan); transform: scale(1.03); }
+  .upload-mini input[type=file] { display: none; }
+  .upload-mini .file-info {
+    font-size: 12px;
+    color: rgba(255,255,255,.85);
+    max-width: 280px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .upload-mini .file-info i { color: #7CD992; margin-right: 4px; }
+  .upload-mini .file-info.demo i { color: #FFD16B; }
+
+  /* =========================================================
+     LAYOUT
+     ========================================================= */
+  main { max-width: 1500px; margin: 0 auto; padding: 20px 32px 64px; }
+
+  /* =========================================================
+     TABS
+     ========================================================= */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    border-bottom: 2px solid var(--border);
+    margin-bottom: 24px;
+  }
+  .tab {
+    padding: 12px 24px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-soft);
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    transition: all .2s;
+  }
+  .tab:hover { color: var(--navy); }
+  .tab.active {
+    color: var(--navy);
+    border-bottom-color: var(--navy);
+    font-weight: 600;
+  }
+  .tab i { margin-right: 8px; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* =========================================================
+     FILTERS
+     ========================================================= */
+  .filters {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: end;
+  }
+  .filter-group { flex: 1; min-width: 220px; }
+  .filter-group label {
+    display: block; font-size: 12px; font-weight: 600;
+    color: var(--text-soft); text-transform: uppercase;
+    letter-spacing: .5px; margin-bottom: 6px;
+  }
+  .filter-group select, .filter-group input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    background: white;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .filter-group select:focus, .filter-group input:focus {
+    outline: none;
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(74,123,157,.15);
+  }
+
+  /* =========================================================
+     CARDS DE RESUMO
+     ========================================================= */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .summary-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 18px;
+    box-shadow: var(--shadow);
+    border-left: 4px solid var(--blue);
+  }
+  .summary-card .label {
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    color: var(--text-soft); letter-spacing: .5px;
+  }
+  .summary-card .value {
+    font-size: 22px; font-weight: 700;
+    color: var(--navy); margin-top: 6px;
+    font-family: "SF Mono", Monaco, "Courier New", monospace;
+  }
+  .summary-card .sub {
+    font-size: 12px; color: var(--text-soft); margin-top: 4px;
+  }
+  .summary-card.green { border-left-color: var(--green); }
+  .summary-card.yellow { border-left-color: var(--yellow); }
+  .summary-card.red { border-left-color: var(--red); }
+
+  /* =========================================================
+     PAINEL (chart + tabela)
+     ========================================================= */
+  .panel {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+    margin-bottom: 24px;
+  }
+  .panel h2 {
+    margin: 0 0 16px;
+    font-size: 16px;
+    color: var(--navy);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .chart-container { position: relative; height: 320px; }
+
+  /* =========================================================
+     TABELA
+     ========================================================= */
+  table.data {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  table.data thead th {
+    background: var(--navy);
+    color: white;
+    padding: 10px 12px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .3px;
+    position: sticky; top: 0;
+  }
+  table.data tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background .15s, box-shadow .15s;
+    cursor: pointer;
+  }
+  table.data tbody tr:nth-child(even) { background: #FAFBFC; }
+  table.data tbody tr:hover {
+    background: var(--blue-light);
+    box-shadow: inset 4px 0 0 var(--un-blue);
+  }
+  table.data tbody tr td:first-child { position: relative; }
+  table.data tbody tr:hover td:first-child::after {
+    content: "\f105"; /* fa-chevron-right */
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    position: absolute;
+    right: 4px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--un-blue);
+    font-size: 12px;
+  }
+  table.data td {
+    padding: 10px 12px;
+    vertical-align: top;
+  }
+  table.data .num {
+    font-family: "SF Mono", Monaco, "Courier New", monospace;
+    text-align: right;
+    white-space: nowrap;
+  }
+  .desc-cell {
+    max-width: 320px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+  .delivery-cell {
+    max-width: 280px;
+    font-size: 12px;
+    color: var(--text-soft);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    cursor: help;
+  }
+
+  /* Barra de % gasta */
+  .pct-cell { min-width: 140px; }
+  .pct-bar-wrap {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .pct-bar {
+    flex: 1; height: 8px;
+    background: #E5E7EB;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .pct-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width .4s ease;
+  }
+  .pct-num {
+    font-family: "SF Mono", Monaco, "Courier New", monospace;
+    font-size: 12px; font-weight: 600;
+    min-width: 48px; text-align: right;
+  }
+  .pct-low  { background: linear-gradient(90deg, #DC354580, var(--red)); }
+  .pct-mid  { background: linear-gradient(90deg, #FFC10780, var(--yellow)); }
+  .pct-high { background: linear-gradient(90deg, #28A74580, var(--green)); }
+
+  /* Status badges */
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .3px;
+  }
+  .badge.closed         { background: #D1FAE5; color: #065F46; }
+  .badge.implementation { background: #DBEAFE; color: #1E40AF; }
+  .badge.finalisation   { background: #FEF3C7; color: #92400E; }
+  .badge.cancelled      { background: #FEE2E2; color: #991B1B; }
+  .badge.pipeline       { background: #E5E7EB; color: #374151; }
+
+  tr.cancelled { opacity: .55; }
+
+  /* =========================================================
+     FICHA DE PROJETO
+     ========================================================= */
+  .sp-banner {
+    background: linear-gradient(90deg, var(--un-blue-darker) 0%, var(--un-blue-dark) 60%, var(--un-blue) 100%);
+    color: white;
+    padding: 16px 22px;
+    border-radius: var(--radius);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    box-shadow: var(--shadow);
+  }
+  .sp-banner-code {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: .5px;
+    background: rgba(255,255,255,.15);
+    padding: 8px 16px;
+    border-radius: 8px;
+    min-width: 64px;
+    text-align: center;
+    flex-shrink: 0;
+    border: 1px solid rgba(255,255,255,.25);
+  }
+  .sp-banner-text {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.45;
+    flex: 1;
+  }
+
+  .project-detail {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  .project-detail .full { grid-column: 1 / -1; }
+
+  .info-block { margin-bottom: 18px; }
+  .info-block .label {
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    color: var(--text-soft); letter-spacing: .5px; margin-bottom: 4px;
+  }
+  .info-block .value { font-size: 14px; line-height: 1.5; }
+  .info-block .value.title { font-size: 16px; font-weight: 600; color: var(--navy); }
+
+  .tag {
+    display: inline-block;
+    padding: 4px 10px;
+    margin: 2px 4px 2px 0;
+    background: var(--blue-light);
+    color: var(--navy);
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .tag.sdg { background: #FFE4B5; color: #8B4513; }
+  .tag.donor { background: #E8F5E9; color: #1B5E20; }
+  .tag.partner { background: #F3E5F5; color: #4A148C; }
+  .tag.priority { background: #FFE0E0; color: #8B0000; }
+
+  .pct-big {
+    margin: 8px 0;
+  }
+  .pct-big .pct-bar { height: 16px; }
+  .pct-big .pct-num { font-size: 18px; min-width: 60px; }
+
+  .actions {
+    display: flex; gap: 10px; margin-top: 16px;
+  }
+  .btn {
+    padding: 9px 16px;
+    border: 1px solid var(--blue);
+    background: white;
+    color: var(--navy);
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all .15s;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn:hover { background: var(--blue); color: white; }
+  .btn.primary { background: var(--blue); color: white; }
+  .btn.primary:hover { background: var(--navy); border-color: var(--navy); }
+
+  /* =========================================================
+     EMPTY STATE
+     ========================================================= */
+  .empty {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--text-soft);
+  }
+  .empty i { font-size: 48px; opacity: .3; margin-bottom: 12px; }
+  .empty p { margin: 4px 0; }
+
+  /* =========================================================
+     MULTI-YEAR TABLE
+     ========================================================= */
+  table.years {
+    width: 100%; border-collapse: collapse;
+    font-size: 12px; margin-top: 8px;
+  }
+  table.years th, table.years td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+    text-align: right;
+    font-family: "SF Mono", Monaco, monospace;
+  }
+  table.years th {
+    background: var(--blue-light);
+    color: var(--navy);
+    font-weight: 600;
+    text-align: center;
+  }
+  table.years td.year-label {
+    text-align: left; font-weight: 600;
+    font-family: -apple-system, sans-serif;
+  }
+  .narr-icon {
+    color: var(--blue); cursor: help; margin-left: 6px;
+  }
+
+  /* Print */
+  @media print {
+    header.app-header, .upload-zone, .tabs, .filters, .actions, .file-info { display: none !important; }
+    main { padding: 0; }
+    .panel { box-shadow: none; border: 1px solid var(--border); page-break-inside: avoid; }
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    main { padding: 16px; }
+    .project-detail { grid-template-columns: 1fr; }
+    .filters { flex-direction: column; align-items: stretch; }
+  }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="brand">
+    <h1><i class="fa-solid fa-earth-africa"></i> UN INFO Cabo Verde — Dashboard de Projetos</h1>
+    <div class="subtitle">Relatórios por Focal Point e por Projeto · UNSDCF 2023–2027</div>
+  </div>
+  <div class="upload-mini" id="dropZone">
+    <span class="file-info" id="fileInfo"></span>
+    <label class="btn-upload" for="fileInput" id="uploadBtn">
+      <i class="fa-solid fa-file-csv"></i> Carregar CSV
+    </label>
+    <input type="file" id="fileInput" accept=".csv" />
+  </div>
+</header>
+
+<main>
+
+  <!-- ==================================================
+       TABS
+       ================================================== -->
+  <div class="tabs">
+    <button class="tab active" data-tab="focal">
+      <i class="fa-solid fa-user-tie"></i>Por Focal Point
+    </button>
+    <button class="tab" data-tab="project">
+      <i class="fa-solid fa-folder-open"></i>Por Projeto
+    </button>
+  </div>
+
+  <!-- ==================================================
+       TAB 1 — FOCAL POINT
+       ================================================== -->
+  <div class="tab-content active" id="tab-focal">
+    <div class="filters">
+      <div class="filter-group">
+        <label>Focal Point</label>
+        <select id="focalSelect">
+          <option value="">— Selecione um focal point —</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Ano</label>
+        <select id="yearSelect">
+          <option value="all">Todos os anos (2023–2026)</option>
+          <option value="2023">2023</option>
+          <option value="2024">2024</option>
+          <option value="2025">2025</option>
+          <option value="2026">2026</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Status</label>
+        <select id="statusSelect">
+          <option value="all">Todos</option>
+          <option value="Implementation">Implementation</option>
+          <option value="Finalisation">Finalisation</option>
+          <option value="Closed">Closed</option>
+          <option value="Pipeline">Pipeline</option>
+          <option value="Cancelled">Cancelled</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="focalEmpty" class="empty">
+      <i class="fa-solid fa-arrow-up"></i>
+      <p>Carrega o CSV e seleciona um Focal Point para começar.</p>
+    </div>
+
+    <div id="focalReport" style="display:none;">
+      <!-- Cards de resumo -->
+      <div class="summary-grid" id="summaryCards"></div>
+
+      <!-- Gráfico % gasta -->
+      <div class="panel">
+        <h2><i class="fa-solid fa-chart-bar"></i> Taxa de execução por projeto (% gasta)</h2>
+        <div class="chart-container">
+          <canvas id="pctChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Tabela de projetos -->
+      <div class="panel">
+        <h2><i class="fa-solid fa-list"></i> Projetos do Focal Point</h2>
+        <div style="overflow-x:auto;">
+          <table class="data" id="projectTable">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Descrição</th>
+                <th>Status</th>
+                <th>Delivery até ao momento</th>
+                <th class="num">Required</th>
+                <th class="num">Available</th>
+                <th class="num">Gasto</th>
+                <th>% Gasta</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================================================
+       TAB 2 — PROJETO INDIVIDUAL
+       ================================================== -->
+  <div class="tab-content" id="tab-project">
+    <div class="filters">
+      <div class="filter-group" style="flex: 2;">
+        <label>Selecionar Projeto</label>
+        <select id="projectSelect">
+          <option value="">— Carrega o CSV primeiro —</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Pesquisar por ID</label>
+        <input type="text" id="projectSearch" placeholder="ex: 108631" />
+      </div>
+    </div>
+
+    <div id="projectEmpty" class="empty">
+      <i class="fa-solid fa-folder-open"></i>
+      <p>Seleciona um projeto para ver a ficha completa.</p>
+    </div>
+
+    <div id="projectDetail" class="panel" style="display:none;">
+      <!-- preenchido por JS -->
+    </div>
+  </div>
+</main>
+
+<script>
+/* =========================================================
+   ESTADO GLOBAL
+   ========================================================= */
+let DATA = [];          // array de projetos
+let FOCAL_USERS = [];   // lista única de focal users
+let pctChart = null;
+
+const YEARS = [2023, 2024, 2025, 2026];
+
+/* =========================================================
+   UTILS
+   ========================================================= */
+function num(v) {
+  if (v === null || v === undefined) return 0;
+  const n = parseFloat(String(v).replace(/[^\d.-]/g, ''));
+  return isNaN(n) ? 0 : n;
+}
+function fmtMoney(v) {
+  if (!v && v !== 0) return '--';
+  return v.toLocaleString('pt-PT', { maximumFractionDigits: 0 });
+}
+function fmtPct(v) {
+  if (!isFinite(v)) return '--';
+  return v.toFixed(1) + '%';
+}
+function pctClass(p) {
+  if (p < 40) return 'pct-low';
+  if (p < 75) return 'pct-mid';
+  return 'pct-high';
+}
+function statusBadge(s) {
+  if (!s) return '<span class="badge pipeline">--</span>';
+  const cls = s.toLowerCase().replace(/\s+/g, '');
+  return `<span class="badge ${cls}">${s}</span>`;
+}
+function splitMulti(s) {
+  if (!s) return [];
+  return String(s).split(/;|,/).map(x => x.trim()).filter(Boolean);
+}
+function escapeHtml(s) {
+  if (s == null) return '';
+  return String(s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+/* =========================================================
+   PARSE CSV
+   ========================================================= */
+function loadCSV(file) {
+  Papa.parse(file, {
+    header: true,
+    skipEmptyLines: true,
+    dynamicTyping: false,
+    transformHeader: h => h.trim(),
+    complete: (res) => {
+      DATA = res.data
+        .filter(r => r.ID && String(r.ID).trim() !== '')
+        .map(r => ({
+          ID: String(r.ID).trim(),
+          Description: (r.Description || '').trim(),
+          Status: (r.Status || '').trim(),
+          StartDate: (r['Start date'] || '').trim(),
+          EndDate: (r['End date'] || '').trim(),
+          Agencies: (r.Agencies || '').trim(),
+          AgencyAbbr: (r['Agency abbreviations'] || '').trim(),
+          FocalUsers: splitMulti(r['Focal users']),
+          ContributingPartners: splitMulti(r['Contributing partners']),
+          ImplementationPartners: splitMulti(r['Implementation partners']),
+          SDGGoals: splitMulti(r['SDG Goals']),
+          StrategicPriority: (r['Strategic priority'] || '').trim(),
+          StrategicPriorityCode: (r['Strategic priority code'] || '').trim(),
+          OutcomeCode: (r['Outcome code'] || '').trim(),
+          OutputCode: (r['Output code'] || '').trim(),
+          Geography: (r.Geography || '').trim(),
+          TotalRequired: num(r['Total required resources']),
+          TotalAvailable: num(r['Total available resources']),
+          TotalExpenditure: num(r['Total expenditure resources']),
+          years: Object.fromEntries(YEARS.map(y => [y, {
+            required: num(r[`${y} Required`]),
+            available: num(r[`${y} Available`]),
+            expenditure: num(r[`${y} Expenditure`]),
+            narrative: (r[`${y} Narrative`] || '').trim()
+          }])),
+          _raw: r
+        }));
+
+      // Lista única de focal users
+      const set = new Set();
+      DATA.forEach(p => p.FocalUsers.forEach(u => set.add(u)));
+      FOCAL_USERS = Array.from(set).sort((a,b) => a.localeCompare(b, 'pt'));
+
+      populateFilters();
+      showFileInfo(file.name, DATA.length);
+    },
+    error: (err) => alert('Erro a ler o CSV: ' + err.message)
+  });
+}
+
+function showFileInfo(name, count) {
+  const el = document.getElementById('fileInfo');
+  el.classList.remove('demo');
+  el.innerHTML = `<i class="fa-solid fa-circle-check"></i> ${escapeHtml(name)} · ${count} projetos`;
+}
+
+function populateFilters() {
+  // Focal users
+  const fs = document.getElementById('focalSelect');
+  fs.innerHTML = '<option value="">— Selecione um focal point —</option>' +
+    FOCAL_USERS.map(u => `<option value="${escapeHtml(u)}">${escapeHtml(u)}</option>`).join('');
+
+  // Projects
+  const ps = document.getElementById('projectSelect');
+  ps.innerHTML = '<option value="">— Selecione um projeto —</option>' +
+    DATA.map(p => `<option value="${escapeHtml(p.ID)}">${escapeHtml(p.ID)} — ${escapeHtml(p.Description.slice(0, 60))}</option>`).join('');
+}
+
+/* =========================================================
+   TAB 1 — RELATÓRIO POR FOCAL POINT
+   ========================================================= */
+function renderFocalReport() {
+  const focal = document.getElementById('focalSelect').value;
+  const year = document.getElementById('yearSelect').value;
+  const status = document.getElementById('statusSelect').value;
+
+  if (!focal) {
+    document.getElementById('focalEmpty').style.display = 'block';
+    document.getElementById('focalReport').style.display = 'none';
+    return;
+  }
+
+  let projects = DATA.filter(p => p.FocalUsers.includes(focal));
+  if (status !== 'all') projects = projects.filter(p => p.Status === status);
+
+  // Cálculo dos totais conforme o ano
+  const rows = projects.map(p => {
+    let req, avail, exp, delivery;
+    if (year === 'all') {
+      req = p.TotalRequired;
+      avail = p.TotalAvailable;
+      exp = p.TotalExpenditure;
+      delivery = YEARS
+        .filter(y => p.years[y].narrative)
+        .map(y => `[${y}] ${p.years[y].narrative}`)
+        .join(' ');
+    } else {
+      const y = parseInt(year);
+      req = p.years[y].required;
+      avail = p.years[y].available;
+      exp = p.years[y].expenditure;
+      delivery = p.years[y].narrative || '';
+    }
+    const pct = avail > 0 ? (exp / avail) * 100 : 0;
+    return { p, req, avail, exp, pct, delivery };
+  });
+
+  // Cards
+  const totals = rows.reduce((a, r) => ({
+    req: a.req + r.req,
+    avail: a.avail + r.avail,
+    exp: a.exp + r.exp
+  }), { req: 0, avail: 0, exp: 0 });
+  const avgPct = rows.length ? rows.reduce((s, r) => s + r.pct, 0) / rows.length : 0;
+  const overallPct = totals.avail > 0 ? (totals.exp / totals.avail) * 100 : 0;
+
+  document.getElementById('summaryCards').innerHTML = `
+    <div class="summary-card">
+      <div class="label"><i class="fa-solid fa-folder"></i> Projetos</div>
+      <div class="value">${rows.length}</div>
+      <div class="sub">${focal}</div>
+    </div>
+    <div class="summary-card">
+      <div class="label"><i class="fa-solid fa-bullseye"></i> Required</div>
+      <div class="value">${fmtMoney(totals.req)}</div>
+      <div class="sub">USD</div>
+    </div>
+    <div class="summary-card">
+      <div class="label"><i class="fa-solid fa-coins"></i> Available</div>
+      <div class="value">${fmtMoney(totals.avail)}</div>
+      <div class="sub">USD</div>
+    </div>
+    <div class="summary-card green">
+      <div class="label"><i class="fa-solid fa-money-bill-trend-up"></i> Gasto</div>
+      <div class="value">${fmtMoney(totals.exp)}</div>
+      <div class="sub">USD</div>
+    </div>
+    <div class="summary-card ${pctClass(overallPct).replace('pct-','').replace('low','red').replace('mid','yellow').replace('high','green')}">
+      <div class="label"><i class="fa-solid fa-percent"></i> Execução global</div>
+      <div class="value">${fmtPct(overallPct)}</div>
+      <div class="sub">média ponderada</div>
+    </div>
+  `;
+
+  // Tabela
+  const tbody = document.querySelector('#projectTable tbody');
+  if (rows.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:24px; color:var(--text-soft);">Sem projetos para este filtro.</td></tr>`;
+  } else {
+    tbody.innerHTML = rows.map(({ p, req, avail, exp, pct, delivery }) => `
+      <tr class="${p.Status === 'Cancelled' ? 'cancelled' : ''}" data-id="${escapeHtml(p.ID)}" title="Clica para ver a ficha completa do projeto">
+        <td><strong>${escapeHtml(p.ID)}</strong></td>
+        <td><div class="desc-cell" title="${escapeHtml(p.Description)}">${escapeHtml(p.Description)}</div></td>
+        <td>${statusBadge(p.Status)}</td>
+        <td><div class="delivery-cell" title="${escapeHtml(delivery)}">${escapeHtml(delivery) || '<em style="color:#999;">sem narrativa</em>'}</div></td>
+        <td class="num">${fmtMoney(req)}</td>
+        <td class="num">${fmtMoney(avail)}</td>
+        <td class="num">${fmtMoney(exp)}</td>
+        <td class="pct-cell">
+          <div class="pct-bar-wrap">
+            <div class="pct-bar"><div class="pct-bar-fill ${pctClass(pct)}" style="width:${Math.min(100,pct)}%"></div></div>
+            <span class="pct-num">${fmtPct(pct)}</span>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  // Gráfico
+  renderPctChart(rows);
+
+  document.getElementById('focalEmpty').style.display = 'none';
+  document.getElementById('focalReport').style.display = 'block';
+}
+
+function renderPctChart(rows) {
+  const ctx = document.getElementById('pctChart').getContext('2d');
+  if (pctChart) pctChart.destroy();
+
+  const sorted = rows.slice().sort((a,b) => b.pct - a.pct);
+  const labels = sorted.map(r => r.p.ID);
+  const data = sorted.map(r => Math.min(100, r.pct));
+  const colors = sorted.map(r => {
+    if (r.pct < 40) return '#DC3545';
+    if (r.pct < 75) return '#FFC107';
+    return '#28A745';
+  });
+
+  pctChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: '% Gasta',
+        data,
+        backgroundColor: colors,
+        borderRadius: 4,
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            title: (items) => {
+              const r = sorted[items[0].dataIndex];
+              return `${r.p.ID} — ${r.p.Description.slice(0, 60)}...`;
+            },
+            label: (item) => `${item.parsed.x.toFixed(1)}%`
+          }
+        }
+      },
+      scales: {
+        x: { beginAtZero: true, max: 100, ticks: { callback: v => v + '%' } },
+        y: { ticks: { font: { family: 'monospace' } } }
+      }
+    }
+  });
+}
+
+/* =========================================================
+   TAB 2 — FICHA DE PROJETO
+   ========================================================= */
+function renderProjectDetail(id) {
+  const p = DATA.find(x => x.ID === id);
+  if (!p) {
+    document.getElementById('projectEmpty').style.display = 'block';
+    document.getElementById('projectDetail').style.display = 'none';
+    return;
+  }
+
+  const pct = p.TotalAvailable > 0 ? (p.TotalExpenditure / p.TotalAvailable) * 100 : 0;
+
+  const yearsTable = `
+    <table class="years">
+      <thead>
+        <tr>
+          <th>Ano</th><th>Required</th><th>Available</th><th>Expenditure</th><th>% Gasta</th><th>Narrativa</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${YEARS.map(y => {
+          const yp = p.years[y];
+          const ypct = yp.available > 0 ? (yp.expenditure / yp.available) * 100 : 0;
+          return `
+            <tr>
+              <td class="year-label">${y}</td>
+              <td>${yp.required ? fmtMoney(yp.required) : '--'}</td>
+              <td>${yp.available ? fmtMoney(yp.available) : '--'}</td>
+              <td>${yp.expenditure ? fmtMoney(yp.expenditure) : '--'}</td>
+              <td>${yp.available > 0 ? fmtPct(ypct) : '--'}</td>
+              <td style="text-align:left; max-width:300px;">
+                ${yp.narrative
+                  ? `<i class="fa-solid fa-circle-info narr-icon" title="${escapeHtml(yp.narrative)}"></i> <span style="font-size:11px; color:var(--text-soft);">${escapeHtml(yp.narrative.slice(0,80))}${yp.narrative.length > 80 ? '…' : ''}</span>`
+                  : '<em style="color:#bbb;">--</em>'}
+              </td>
+            </tr>
+          `;
+        }).join('')}
+      </tbody>
+    </table>
+  `;
+
+  document.getElementById('projectDetail').innerHTML = `
+    <!-- BANNER PRIORIDADE ESTRATÉGICA -->
+    <div class="sp-banner full">
+      <div class="sp-banner-code">${escapeHtml(p.StrategicPriorityCode || '—')}</div>
+      <div class="sp-banner-text">${escapeHtml(p.StrategicPriority || 'Prioridade Estratégica não definida')}</div>
+    </div>
+
+    <div class="project-detail">
+      <!-- COLUNA ESQUERDA -->
+      <div>
+        <div class="info-block">
+          <div class="label"><i class="fa-solid fa-hashtag"></i> ID do Projeto</div>
+          <div class="value title">${escapeHtml(p.ID)}</div>
+        </div>
+        <div class="info-block">
+          <div class="label"><i class="fa-solid fa-file-lines"></i> Descrição</div>
+          <div class="value">${escapeHtml(p.Description)}</div>
+        </div>
+        <div class="info-block">
+          <div class="label"><i class="fa-solid fa-flag"></i> Status</div>
+          <div class="value">${statusBadge(p.Status)}</div>
+        </div>
+        <div class="info-block">
+          <div class="label"><i class="fa-solid fa-calendar"></i> Período</div>
+          <div class="value">${escapeHtml(p.StartDate)} → ${escapeHtml(p.EndDate)}</div>
+        </div>
+        <div class="info-block">
+          <div class="label"><i class="fa-solid fa-user-tie"></i> Focal Users</div>
+          <div class="value">
+            ${p.FocalUsers.length ? p.FocalUsers.map(u => `<span class="tag">${escapeHtml(u)}</span>`).join('') : '<em>--</em>'}
+          </div>
+        </div>
+        <div class="info-block">
+          <div class="label"><i class="fa-solid fa-building-un"></i> Agências ONU</div>
+          <div class="value">${escapeHtml(p.Agencies) || '<em>--</em>'}</div>
+        </div>
+        <div class="info-block">
+          <div class="label"><i class="fa-solid fa-location-dot"></i> Geografia</div>
+          <div class="value">${escapeHtml(p.Geography) || '<em>--</em>'}</div>
+        </div>
+      </div>
+
+      <!-- COLUNA DIREITA -->
+      <div>
+        <div class="info-block">
+          <div class="label"><i class="fa-solid fa-chart-pie"></i> Execução Financeira (USD)</div>
+          <div class="summary-grid" style="margin-top:8px; grid-template-columns: repeat(3, 1fr);">
+            <div class="summary-card">
+              <div class="label">Required</div>
+              <div class="value" style="font-size:18px;">${fmtMoney(p.TotalRequired)}</div>
+            </div>
+            <div class="summary-card">
+              <div class="label">Available</div>
+              <div class="value" style="font-size:18px;">${fmtMoney(p.TotalAvailable)}</div>
+            </div>
+            <div class="summary-card green">
+              <div class="label">Gasto</div>
+              <div class="value" style="font-size:18px;">${fmtMoney(p.TotalExpenditure)}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-block">
+          <div class="label"><i class="fa-solid fa-percent"></i> Taxa de execução global</div>
+          <div class="pct-big">
+            <div class="pct-bar-wrap">
+              <div class="pct-bar"><div class="pct-bar-fill ${pctClass(pct)}" style="width:${Math.min(100,pct)}%"></div></div>
+              <span class="pct-num">${fmtPct(pct)}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-block">
+          <div class="label"><i class="fa-solid fa-table-list"></i> Detalhe Anual</div>
+          ${yearsTable}
+        </div>
+      </div>
+
+      <!-- LINHA INFERIOR -->
+      <div class="full">
+        <div class="info-block">
+          <div class="label"><i class="fa-solid fa-hand-holding-dollar"></i> Doadores (Contributing Partners)</div>
+          <div class="value">
+            ${p.ContributingPartners.length ? p.ContributingPartners.map(d => `<span class="tag donor">${escapeHtml(d)}</span>`).join('') : '<em>--</em>'}
+          </div>
+        </div>
+        <div class="info-block">
+          <div class="label"><i class="fa-solid fa-people-group"></i> Parceiros de Implementação</div>
+          <div class="value">
+            ${p.ImplementationPartners.length ? p.ImplementationPartners.map(d => `<span class="tag partner">${escapeHtml(d)}</span>`).join('') : '<em>--</em>'}
+          </div>
+        </div>
+        <div class="info-block">
+          <div class="label"><i class="fa-solid fa-earth-africa"></i> SDG Goals</div>
+          <div class="value">
+            ${p.SDGGoals.length ? p.SDGGoals.map(s => `<span class="tag sdg">${escapeHtml(s)}</span>`).join('') : '<em>--</em>'}
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn primary" onclick="window.print()">
+            <i class="fa-solid fa-file-pdf"></i> Exportar como PDF
+          </button>
+          <button class="btn" onclick="copyProjectSummary('${escapeHtml(p.ID)}')">
+            <i class="fa-solid fa-copy"></i> Copiar resumo
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('projectEmpty').style.display = 'none';
+  document.getElementById('projectDetail').style.display = 'block';
+}
+
+function copyProjectSummary(id) {
+  const p = DATA.find(x => x.ID === id);
+  if (!p) return;
+  const pct = p.TotalAvailable > 0 ? (p.TotalExpenditure / p.TotalAvailable) * 100 : 0;
+  const txt =
+`PROJETO ${p.ID}
+${p.Description}
+
+Status: ${p.Status}
+Período: ${p.StartDate} → ${p.EndDate}
+Focal Users: ${p.FocalUsers.join(', ')}
+Agências: ${p.Agencies}
+
+FINANCEIRO (USD):
+  Required:  ${fmtMoney(p.TotalRequired)}
+  Available: ${fmtMoney(p.TotalAvailable)}
+  Gasto:     ${fmtMoney(p.TotalExpenditure)}
+  % Gasta:   ${fmtPct(pct)}
+
+Doadores: ${p.ContributingPartners.join('; ')}
+Parceiros: ${p.ImplementationPartners.join('; ')}
+SDGs: ${p.SDGGoals.join('; ')}
+Prioridade: ${p.StrategicPriorityCode} — ${p.StrategicPriority}`;
+
+  navigator.clipboard.writeText(txt).then(() => {
+    alert('Resumo copiado para a área de transferência!');
+  });
+}
+
+/* =========================================================
+   EVENTOS
+   ========================================================= */
+// Upload (label trata do clique nativamente; aqui só drag & drop sobre a barra)
+const dropZone = document.getElementById('dropZone');
+const uploadBtn = document.getElementById('uploadBtn');
+const fileInput = document.getElementById('fileInput');
+
+fileInput.addEventListener('change', e => {
+  if (e.target.files[0]) loadCSV(e.target.files[0]);
+});
+['dragover','dragenter'].forEach(ev =>
+  dropZone.addEventListener(ev, e => { e.preventDefault(); uploadBtn.classList.add('dragover'); })
+);
+['dragleave','drop'].forEach(ev =>
+  dropZone.addEventListener(ev, e => { e.preventDefault(); uploadBtn.classList.remove('dragover'); })
+);
+dropZone.addEventListener('drop', e => {
+  if (e.dataTransfer.files[0]) loadCSV(e.dataTransfer.files[0]);
+});
+// Permitir drag & drop em qualquer ponto do ecrã também (mais conveniente)
+['dragover','dragenter'].forEach(ev =>
+  document.body.addEventListener(ev, e => { e.preventDefault(); uploadBtn.classList.add('dragover'); })
+);
+document.body.addEventListener('drop', e => {
+  e.preventDefault();
+  uploadBtn.classList.remove('dragover');
+  if (e.dataTransfer.files[0]) loadCSV(e.dataTransfer.files[0]);
+});
+
+// Tabs
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById('tab-' + t.dataset.tab).classList.add('active');
+  });
+});
+
+// Filtros tab 1
+['focalSelect','yearSelect','statusSelect'].forEach(id =>
+  document.getElementById(id).addEventListener('change', renderFocalReport)
+);
+
+// Linhas clicáveis -> abrir ficha do projeto
+function openProject(id) {
+  // muda para a tab 2
+  document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(x => x.classList.remove('active'));
+  document.querySelector('.tab[data-tab="project"]').classList.add('active');
+  document.getElementById('tab-project').classList.add('active');
+  // seleciona o projeto e renderiza
+  const sel = document.getElementById('projectSelect');
+  if ([...sel.options].some(o => o.value === id)) sel.value = id;
+  renderProjectDetail(id);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+document.querySelector('#projectTable tbody').addEventListener('click', e => {
+  const tr = e.target.closest('tr[data-id]');
+  if (tr) openProject(tr.dataset.id);
+});
+
+// Tab 2
+document.getElementById('projectSelect').addEventListener('change', e => {
+  if (e.target.value) renderProjectDetail(e.target.value);
+});
+document.getElementById('projectSearch').addEventListener('input', e => {
+  const id = e.target.value.trim();
+  const p = DATA.find(x => x.ID === id);
+  if (p) {
+    document.getElementById('projectSelect').value = id;
+    renderProjectDetail(id);
+  }
+});
+
+/* =========================================================
+   DADOS DEMO (fallback)
+   ========================================================= */
+const DEMO_CSV = `ID,Description,Focal users,Start date,End date,Status,Strategic priority code,Strategic priority,Outcome code,Output code,Geography,Agencies,Agency abbreviations,Contributing partners,Implementation partners,SDG Goals,Total required resources,Total available resources,Total expenditure resources,2023 Required,2023 Available,2023 Expenditure,2023 Narrative,2024 Required,2024 Available,2024 Expenditure,2024 Narrative,2025 Required,2025 Available,2025 Expenditure,2025 Narrative,2026 Required,2026 Available,2026 Expenditure,2026 Narrative
+108631,"Apoio à formação em educação financeira e empreendedorismo para imigrantes","Sara Brigham",2023-01-01,2024-12-31,Closed,SP 2,"Transformação Económica Inclusiva",2.1,2.1.4,"Cabo Verde (Praia)","International Organization for Migration",IOM,"IOM Development Fund","AAI; CM Praia; Plataforma Comunidades Africanas","4 Quality Education; 8 Decent Jobs",109422,109422,75497,85000,85000,62169,"Salas de formação criadas no Parque 5 de Julho. Concurso Start-ups Imigrantes lançado.",24422,24422,13328,"Formações TOP30 realizadas. TOP10 iniciaram fase de incubação em Agosto 2024.",,,,,,,,,
+108554,"Projeto OYA - aumento da empregabilidade jovem","Katya Mascarenhas Neves; Edson Fernandes",2023-01-01,2023-12-31,Closed,SP 2,"Transformação Económica",2.1,2.1.3,"Cabo Verde","UNDP",UNDP,"Core Funding","MAA; MICE","1 No Poverty; 8 Decent Jobs; 9 Industry",80000,80000,20486,80000,80000,20486,"Diagnóstico inicial concluído. Formações lançadas para jovens.",,,,,,,,,,,,
+108676,"Reforço de instituições públicas em direitos humanos","Frederic Mbassa; Ulrike Mbuton",2023-03-01,2024-12-31,Closed,SP 3,"Governança e Estado de Direito",3.2,3.2.1,"Cabo Verde","OHCHR",OHCHR,"Core Funding","CNDHC; Ministry of Justice","16 Peace and Justice",312000,292000,292000,105000,85000,85000,"Capacitação de magistrados e oficiais de justiça.",207000,207000,207000,"Plano nacional de DH lançado.",,,,,,,,,
+108892,"Programa de transição energética nas ilhas","Sara Brigham; Maria Tavares",2024-01-01,2026-12-31,Implementation,SP 2,"Transição Justa",2.2,2.2.1,"Cabo Verde (todas as ilhas)","UNDP",UNDP,"GEF; EU","MAA; INMG","7 Affordable Energy; 13 Climate Action",450000,380000,156000,,,,,150000,150000,98000,"Estudos de viabilidade concluídos em Santo Antão e São Vicente.",200000,180000,58000,"Instalação de painéis solares em 3 escolas piloto.",100000,50000,0,"Em pipeline."
+108925,"Empoderamento das mulheres rurais","Katya Mascarenhas Neves",2024-06-01,2027-05-31,Implementation,SP 1,"Inclusão e Equidade",1.3,1.3.2,"Cabo Verde (Santiago, Fogo)","UN Women",UNWOMEN,"Sweden; Spain","ICIEG; ONG locais","5 Gender Equality; 1 No Poverty",280000,210000,67500,,,,,80000,80000,42500,"Formações em liderança realizadas em 4 comunidades.",100000,80000,25000,"Cooperativas femininas criadas em Santa Cruz.",50000,30000,0,
+108950,"Apoio à modernização do registo civil","Sara Brigham",2025-01-01,2026-12-31,Pipeline,SP 3,"Governança",3.1,3.1.2,"Cabo Verde","UNICEF",UNICEF,"Pipeline","DGRN","16 Peace and Justice",180000,0,0,,,,,,,,,90000,0,0,"Aguarda mobilização de recursos.",90000,0,0,
+108999,"Saúde materna e infantil","Frederic Mbassa",2023-01-01,2025-12-31,Cancelled,SP 1,"Saúde",1.1,1.1.1,"Cabo Verde","WHO",WHO,"Core Funding","Ministério da Saúde","3 Good Health",150000,75000,0,50000,25000,0,"Cancelado por reformulação programática.",,,,,,,,,,,,`;
+
+// Carrega demo automaticamente
+window.addEventListener('DOMContentLoaded', () => {
+  Papa.parse(DEMO_CSV, {
+    header: true,
+    skipEmptyLines: true,
+    transformHeader: h => h.trim(),
+    complete: (res) => {
+      DATA = res.data
+        .filter(r => r.ID && String(r.ID).trim() !== '')
+        .map(r => ({
+          ID: String(r.ID).trim(),
+          Description: (r.Description || '').trim(),
+          Status: (r.Status || '').trim(),
+          StartDate: (r['Start date'] || '').trim(),
+          EndDate: (r['End date'] || '').trim(),
+          Agencies: (r.Agencies || '').trim(),
+          AgencyAbbr: (r['Agency abbreviations'] || '').trim(),
+          FocalUsers: splitMulti(r['Focal users']),
+          ContributingPartners: splitMulti(r['Contributing partners']),
+          ImplementationPartners: splitMulti(r['Implementation partners']),
+          SDGGoals: splitMulti(r['SDG Goals']),
+          StrategicPriority: (r['Strategic priority'] || '').trim(),
+          StrategicPriorityCode: (r['Strategic priority code'] || '').trim(),
+          OutcomeCode: (r['Outcome code'] || '').trim(),
+          OutputCode: (r['Output code'] || '').trim(),
+          Geography: (r.Geography || '').trim(),
+          TotalRequired: num(r['Total required resources']),
+          TotalAvailable: num(r['Total available resources']),
+          TotalExpenditure: num(r['Total expenditure resources']),
+          years: Object.fromEntries(YEARS.map(y => [y, {
+            required: num(r[`${y} Required`]),
+            available: num(r[`${y} Available`]),
+            expenditure: num(r[`${y} Expenditure`]),
+            narrative: (r[`${y} Narrative`] || '').trim()
+          }]))
+        }));
+      const set = new Set();
+      DATA.forEach(p => p.FocalUsers.forEach(u => set.add(u)));
+      FOCAL_USERS = Array.from(set).sort((a,b) => a.localeCompare(b, 'pt'));
+      populateFilters();
+      const fi = document.getElementById('fileInfo');
+      fi.classList.add('demo');
+      fi.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Modo demo · ' + DATA.length + ' projetos';
+    }
+  });
+});
+</script>
+
+</body>
+</html>
