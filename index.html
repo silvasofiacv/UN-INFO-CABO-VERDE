@@ -145,7 +145,6 @@
     white-space: nowrap;
   }
   .upload-mini .file-info i { color: var(--green); margin-right: 4px; }
-  .upload-mini .file-info.demo i { color: #E89B00; }
 
   /* =========================================================
      LAYOUT
@@ -301,7 +300,7 @@
   }
   table.data tbody tr td:first-child { position: relative; }
   table.data tbody tr:hover td:first-child::after {
-    content: "\f105"; /* fa-chevron-right */
+    content: "\f105";
     font-family: "Font Awesome 6 Free";
     font-weight: 900;
     position: absolute;
@@ -443,11 +442,10 @@
   .tag.donor { background: #E8F5E9; color: #1B5E20; }
   .tag.partner { background: #F3E5F5; color: #4A148C; }
   .tag.priority { background: var(--un-cyan-light); color: var(--un-cyan-dark); }
-  /* SDGs com a cor oficial de cada objetivo */
   .tag.sdg {
     color: white;
     font-weight: 600;
-    background: #888; /* fallback */
+    background: #888;
   }
   .tag.sdg[data-sdg="1"]  { background: var(--sdg-1); }
   .tag.sdg[data-sdg="2"]  { background: var(--sdg-2); color: var(--un-dark); }
@@ -554,7 +552,7 @@
     <div class="subtitle">Relatórios por Focal Point e por Projeto · UNSDCF 2023–2027</div>
   </div>
   <div class="upload-mini" id="dropZone">
-    <span class="file-info" id="fileInfo"></span>
+    <span class="file-info" id="fileInfo"><i class="fa-solid fa-spinner fa-pulse"></i> A carregar dados do GitHub...</span>
     <label class="btn-upload" for="fileInput" id="uploadBtn">
       <i class="fa-solid fa-file-csv"></i> Carregar CSV
     </label>
@@ -571,9 +569,7 @@
 
 <main>
 
-  <!-- ==================================================
-       TABS
-       ================================================== -->
+  <!-- TABS -->
   <div class="tabs">
     <button class="tab active" data-tab="focal">
       <i class="fa-solid fa-user-tie"></i>Por Focal Point
@@ -583,9 +579,7 @@
     </button>
   </div>
 
-  <!-- ==================================================
-       TAB 1 — FOCAL POINT
-       ================================================== -->
+  <!-- TAB 1 — FOCAL POINT -->
   <div class="tab-content active" id="tab-focal">
     <div class="filters">
       <div class="filter-group">
@@ -623,18 +617,13 @@
     </div>
 
     <div id="focalReport" style="display:none;">
-      <!-- Cards de resumo -->
       <div class="summary-grid" id="summaryCards"></div>
-
-      <!-- Gráfico % gasta -->
       <div class="panel">
         <h2><i class="fa-solid fa-chart-bar"></i> Taxa de execução por projeto (% gasta)</h2>
         <div class="chart-container">
           <canvas id="pctChart"></canvas>
         </div>
       </div>
-
-      <!-- Tabela de projetos -->
       <div class="panel">
         <h2><i class="fa-solid fa-list"></i> Projetos do Focal Point</h2>
         <div style="overflow-x:auto;">
@@ -658,9 +647,7 @@
     </div>
   </div>
 
-  <!-- ==================================================
-       TAB 2 — PROJETO INDIVIDUAL
-       ================================================== -->
+  <!-- TAB 2 — PROJETO INDIVIDUAL -->
   <div class="tab-content" id="tab-project">
     <div class="filters">
       <div class="filter-group" style="flex: 2;">
@@ -680,9 +667,7 @@
       <p>Seleciona um projeto para ver a ficha completa.</p>
     </div>
 
-    <div id="projectDetail" class="panel" style="display:none;">
-      <!-- preenchido por JS -->
-    </div>
+    <div id="projectDetail" class="panel" style="display:none;"></div>
   </div>
 </main>
 
@@ -690,8 +675,8 @@
 /* =========================================================
    ESTADO GLOBAL
    ========================================================= */
-let DATA = [];          // array de projetos
-let FOCAL_USERS = [];   // lista única de focal users
+let DATA = [];
+let FOCAL_USERS = [];
 let pctChart = null;
 
 const YEARS = [2023, 2024, 2025, 2026];
@@ -735,555 +720,74 @@ function escapeHtml(s) {
 }
 
 /* =========================================================
-   PARSE CSV
+   CARREGAR CSV DO GITHUB (FIXO)
    ========================================================= */
-function loadCSV(file) {
-  Papa.parse(file, {
-    header: true,
-    skipEmptyLines: true,
-    dynamicTyping: false,
-    transformHeader: h => h.trim(),
-    complete: (res) => {
-      DATA = res.data
-        .filter(r => r.ID && String(r.ID).trim() !== '')
-        .map(r => ({
-          ID: String(r.ID).trim(),
-          Description: (r.Description || '').trim(),
-          Status: (r.Status || '').trim(),
-          StartDate: (r['Start date'] || '').trim(),
-          EndDate: (r['End date'] || '').trim(),
-          Agencies: (r.Agencies || '').trim(),
-          AgencyAbbr: (r['Agency abbreviations'] || '').trim(),
-          FocalUsers: splitMulti(r['Focal users']),
-          ContributingPartners: splitMulti(r['Contributing partners']),
-          ImplementationPartners: splitMulti(r['Implementation partners']),
-          SDGGoals: splitMulti(r['SDG Goals']),
-          StrategicPriority: (r['Strategic priority'] || '').trim(),
-          StrategicPriorityCode: (r['Strategic priority code'] || '').trim(),
-          OutcomeCode: (r['Outcome code'] || '').trim(),
-          OutputCode: (r['Output code'] || '').trim(),
-          Geography: (r.Geography || '').trim(),
-          TotalRequired: num(r['Total required resources']),
-          TotalAvailable: num(r['Total available resources']),
-          TotalExpenditure: num(r['Total expenditure resources']),
-          years: Object.fromEntries(YEARS.map(y => [y, {
-            required: num(r[`${y} Required`]),
-            available: num(r[`${y} Available`]),
-            expenditure: num(r[`${y} Expenditure`]),
-            narrative: (r[`${y} Narrative`] || '').trim()
-          }])),
-          _raw: r
-        }));
+const CSV_URL = 'https://raw.githubusercontent.com/silvasofiacv/UN-INFO-CABO-VERDE/main/export_2026-04-28.csv';
 
-      // Lista única de focal users
-      const set = new Set();
-      DATA.forEach(p => p.FocalUsers.forEach(u => set.add(u)));
-      FOCAL_USERS = Array.from(set).sort((a,b) => a.localeCompare(b, 'pt'));
-
-      populateFilters();
-      showFileInfo(file.name, DATA.length);
-    },
-    error: (err) => alert('Erro a ler o CSV: ' + err.message)
-  });
-}
-
-function showFileInfo(name, count) {
-  const el = document.getElementById('fileInfo');
-  el.classList.remove('demo');
-  el.innerHTML = `<i class="fa-solid fa-circle-check"></i> ${escapeHtml(name)} · ${count} projetos`;
+function carregarCSVdoGitHub() {
+  fetch(CSV_URL)
+    .then(response => {
+      if (!response.ok) throw new Error('CSV não encontrado no GitHub');
+      return response.text();
+    })
+    .then(csvText => {
+      Papa.parse(csvText, {
+        header: true,
+        skipEmptyLines: true,
+        transformHeader: h => h.trim(),
+        complete: (res) => {
+          DATA = res.data
+            .filter(r => r.ID && String(r.ID).trim() !== '')
+            .map(r => ({
+              ID: String(r.ID).trim(),
+              Description: (r.Description || '').trim(),
+              Status: (r.Status || '').trim(),
+              StartDate: (r['Start date'] || '').trim(),
+              EndDate: (r['End date'] || '').trim(),
+              Agencies: (r.Agencies || '').trim(),
+              AgencyAbbr: (r['Agency abbreviations'] || '').trim(),
+              FocalUsers: splitMulti(r['Focal users']),
+              ContributingPartners: splitMulti(r['Contributing partners']),
+              ImplementationPartners: splitMulti(r['Implementation partners']),
+              SDGGoals: splitMulti(r['SDG Goals']),
+              StrategicPriority: (r['Strategic priority'] || '').trim(),
+              StrategicPriorityCode: (r['Strategic priority code'] || '').trim(),
+              OutcomeCode: (r['Outcome code'] || '').trim(),
+              OutputCode: (r['Output code'] || '').trim(),
+              Geography: (r.Geography || '').trim(),
+              TotalRequired: num(r['Total required resources']),
+              TotalAvailable: num(r['Total available resources']),
+              TotalExpenditure: num(r['Total expenditure resources']),
+              years: Object.fromEntries(YEARS.map(y => [y, {
+                required: num(r[`${y} Required`]),
+                available: num(r[`${y} Available`]),
+                expenditure: num(r[`${y} Expenditure`]),
+                narrative: (r[`${y} Narrative`] || '').trim()
+              }]))
+            }));
+          
+          const set = new Set();
+          DATA.forEach(p => p.FocalUsers.forEach(u => set.add(u)));
+          FOCAL_USERS = Array.from(set).sort((a,b) => a.localeCompare(b, 'pt'));
+          
+          populateFilters();
+          
+          const fi = document.getElementById('fileInfo');
+          fi.innerHTML = `<i class="fa-solid fa-circle-check"></i> Dados do GitHub · ${DATA.length} projetos`;
+          
+          // Atualiza a tabela se já houver um focal point selecionado
+          const focalSelect = document.getElementById('focalSelect');
+          if (focalSelect.value) renderFocalReport();
+        }
+      });
+    })
+    .catch(error => {
+      console.error('Erro ao carregar CSV:', error);
+      document.getElementById('fileInfo').innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Erro ao carregar ficheiro do GitHub';
+    });
 }
 
 function populateFilters() {
-  // Focal users
   const fs = document.getElementById('focalSelect');
   fs.innerHTML = '<option value="">— Selecione um focal point —</option>' +
-    FOCAL_USERS.map(u => `<option value="${escapeHtml(u)}">${escapeHtml(u)}</option>`).join('');
-
-  // Projects
-  const ps = document.getElementById('projectSelect');
-  ps.innerHTML = '<option value="">— Selecione um projeto —</option>' +
-    DATA.map(p => `<option value="${escapeHtml(p.ID)}">${escapeHtml(p.ID)} — ${escapeHtml(p.Description.slice(0, 60))}</option>`).join('');
-}
-
-/* =========================================================
-   TAB 1 — RELATÓRIO POR FOCAL POINT
-   ========================================================= */
-function renderFocalReport() {
-  const focal = document.getElementById('focalSelect').value;
-  const year = document.getElementById('yearSelect').value;
-  const status = document.getElementById('statusSelect').value;
-
-  if (!focal) {
-    document.getElementById('focalEmpty').style.display = 'block';
-    document.getElementById('focalReport').style.display = 'none';
-    return;
-  }
-
-  let projects = DATA.filter(p => p.FocalUsers.includes(focal));
-  if (status !== 'all') projects = projects.filter(p => p.Status === status);
-
-  // Cálculo dos totais conforme o ano
-  const rows = projects.map(p => {
-    let req, avail, exp, delivery;
-    if (year === 'all') {
-      req = p.TotalRequired;
-      avail = p.TotalAvailable;
-      exp = p.TotalExpenditure;
-      delivery = YEARS
-        .filter(y => p.years[y].narrative)
-        .map(y => `[${y}] ${p.years[y].narrative}`)
-        .join(' ');
-    } else {
-      const y = parseInt(year);
-      req = p.years[y].required;
-      avail = p.years[y].available;
-      exp = p.years[y].expenditure;
-      delivery = p.years[y].narrative || '';
-    }
-    const pct = avail > 0 ? (exp / avail) * 100 : 0;
-    return { p, req, avail, exp, pct, delivery };
-  });
-
-  // Cards
-  const totals = rows.reduce((a, r) => ({
-    req: a.req + r.req,
-    avail: a.avail + r.avail,
-    exp: a.exp + r.exp
-  }), { req: 0, avail: 0, exp: 0 });
-  const avgPct = rows.length ? rows.reduce((s, r) => s + r.pct, 0) / rows.length : 0;
-  const overallPct = totals.avail > 0 ? (totals.exp / totals.avail) * 100 : 0;
-
-  document.getElementById('summaryCards').innerHTML = `
-    <div class="summary-card">
-      <div class="label"><i class="fa-solid fa-folder"></i> Projetos</div>
-      <div class="value">${rows.length}</div>
-      <div class="sub">${focal}</div>
-    </div>
-    <div class="summary-card">
-      <div class="label"><i class="fa-solid fa-bullseye"></i> Required</div>
-      <div class="value">${fmtMoney(totals.req)}</div>
-      <div class="sub">USD</div>
-    </div>
-    <div class="summary-card">
-      <div class="label"><i class="fa-solid fa-coins"></i> Available</div>
-      <div class="value">${fmtMoney(totals.avail)}</div>
-      <div class="sub">USD</div>
-    </div>
-    <div class="summary-card green">
-      <div class="label"><i class="fa-solid fa-money-bill-trend-up"></i> Gasto</div>
-      <div class="value">${fmtMoney(totals.exp)}</div>
-      <div class="sub">USD</div>
-    </div>
-    <div class="summary-card ${pctClass(overallPct).replace('pct-','').replace('low','red').replace('mid','yellow').replace('high','green')}">
-      <div class="label"><i class="fa-solid fa-percent"></i> Execução global</div>
-      <div class="value">${fmtPct(overallPct)}</div>
-      <div class="sub">média ponderada</div>
-    </div>
-  `;
-
-  // Tabela
-  const tbody = document.querySelector('#projectTable tbody');
-  if (rows.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:24px; color:var(--text-soft);">Sem projetos para este filtro.</td></tr>`;
-  } else {
-    tbody.innerHTML = rows.map(({ p, req, avail, exp, pct, delivery }) => `
-      <tr class="${p.Status === 'Cancelled' ? 'cancelled' : ''}" data-id="${escapeHtml(p.ID)}" title="Clica para ver a ficha completa do projeto">
-        <td><strong>${escapeHtml(p.ID)}</strong></td>
-        <td><div class="desc-cell" title="${escapeHtml(p.Description)}">${escapeHtml(p.Description)}</div></td>
-        <td>${statusBadge(p.Status)}</td>
-        <td><div class="delivery-cell" title="${escapeHtml(delivery)}">${escapeHtml(delivery) || '<em style="color:#999;">sem narrativa</em>'}</div></td>
-        <td class="num">${fmtMoney(req)}</td>
-        <td class="num">${fmtMoney(avail)}</td>
-        <td class="num">${fmtMoney(exp)}</td>
-        <td class="pct-cell">
-          <div class="pct-bar-wrap">
-            <div class="pct-bar"><div class="pct-bar-fill ${pctClass(pct)}" style="width:${Math.min(100,pct)}%"></div></div>
-            <span class="pct-num">${fmtPct(pct)}</span>
-          </div>
-        </td>
-      </tr>
-    `).join('');
-  }
-
-  // Gráfico
-  renderPctChart(rows);
-
-  document.getElementById('focalEmpty').style.display = 'none';
-  document.getElementById('focalReport').style.display = 'block';
-}
-
-function renderPctChart(rows) {
-  const ctx = document.getElementById('pctChart').getContext('2d');
-  if (pctChart) pctChart.destroy();
-
-  const sorted = rows.slice().sort((a,b) => b.pct - a.pct);
-  const labels = sorted.map(r => r.p.ID);
-  const data = sorted.map(r => Math.min(100, r.pct));
-  // Cyan UN INFO uniforme (estilo gráficos uninfo.org)
-  const css = getComputedStyle(document.documentElement);
-  const colors = sorted.map(() => css.getPropertyValue('--un-cyan-bar').trim() || '#3FBDE6');
-
-  pctChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [{
-        label: '% Gasta',
-        data,
-        backgroundColor: colors,
-        borderRadius: 4,
-      }]
-    },
-    options: {
-      indexAxis: 'y',
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            title: (items) => {
-              const r = sorted[items[0].dataIndex];
-              return `${r.p.ID} — ${r.p.Description.slice(0, 60)}...`;
-            },
-            label: (item) => `${item.parsed.x.toFixed(1)}%`
-          }
-        }
-      },
-      scales: {
-        x: { beginAtZero: true, max: 100, ticks: { callback: v => v + '%' } },
-        y: { ticks: { font: { family: 'monospace' } } }
-      }
-    }
-  });
-}
-
-/* =========================================================
-   TAB 2 — FICHA DE PROJETO
-   ========================================================= */
-function renderProjectDetail(id) {
-  const p = DATA.find(x => x.ID === id);
-  if (!p) {
-    document.getElementById('projectEmpty').style.display = 'block';
-    document.getElementById('projectDetail').style.display = 'none';
-    return;
-  }
-
-  const pct = p.TotalAvailable > 0 ? (p.TotalExpenditure / p.TotalAvailable) * 100 : 0;
-
-  const yearsTable = `
-    <table class="years">
-      <thead>
-        <tr>
-          <th>Ano</th><th>Required</th><th>Available</th><th>Expenditure</th><th>% Gasta</th><th>Narrativa</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${YEARS.map(y => {
-          const yp = p.years[y];
-          const ypct = yp.available > 0 ? (yp.expenditure / yp.available) * 100 : 0;
-          return `
-            <tr>
-              <td class="year-label">${y}</td>
-              <td>${yp.required ? fmtMoney(yp.required) : '--'}</td>
-              <td>${yp.available ? fmtMoney(yp.available) : '--'}</td>
-              <td>${yp.expenditure ? fmtMoney(yp.expenditure) : '--'}</td>
-              <td>${yp.available > 0 ? fmtPct(ypct) : '--'}</td>
-              <td style="text-align:left; max-width:300px;">
-                ${yp.narrative
-                  ? `<i class="fa-solid fa-circle-info narr-icon" title="${escapeHtml(yp.narrative)}"></i> <span style="font-size:11px; color:var(--text-soft);">${escapeHtml(yp.narrative.slice(0,80))}${yp.narrative.length > 80 ? '…' : ''}</span>`
-                  : '<em style="color:#bbb;">--</em>'}
-              </td>
-            </tr>
-          `;
-        }).join('')}
-      </tbody>
-    </table>
-  `;
-
-  document.getElementById('projectDetail').innerHTML = `
-    <!-- BANNER PRIORIDADE ESTRATÉGICA -->
-    <div class="sp-banner full">
-      <div class="sp-banner-code">${escapeHtml(p.StrategicPriorityCode || '—')}</div>
-      <div class="sp-banner-text">${escapeHtml(p.StrategicPriority || 'Prioridade Estratégica não definida')}</div>
-    </div>
-
-    <div class="project-detail">
-      <!-- COLUNA ESQUERDA -->
-      <div>
-        <div class="info-block">
-          <div class="label"><i class="fa-solid fa-hashtag"></i> ID do Projeto</div>
-          <div class="value title">${escapeHtml(p.ID)}</div>
-        </div>
-        <div class="info-block">
-          <div class="label"><i class="fa-solid fa-file-lines"></i> Descrição</div>
-          <div class="value">${escapeHtml(p.Description)}</div>
-        </div>
-        <div class="info-block">
-          <div class="label"><i class="fa-solid fa-flag"></i> Status</div>
-          <div class="value">${statusBadge(p.Status)}</div>
-        </div>
-        <div class="info-block">
-          <div class="label"><i class="fa-solid fa-calendar"></i> Período</div>
-          <div class="value">${escapeHtml(p.StartDate)} → ${escapeHtml(p.EndDate)}</div>
-        </div>
-        <div class="info-block">
-          <div class="label"><i class="fa-solid fa-user-tie"></i> Focal Users</div>
-          <div class="value">
-            ${p.FocalUsers.length ? p.FocalUsers.map(u => `<span class="tag">${escapeHtml(u)}</span>`).join('') : '<em>--</em>'}
-          </div>
-        </div>
-        <div class="info-block">
-          <div class="label"><i class="fa-solid fa-building-un"></i> Agências ONU</div>
-          <div class="value">${escapeHtml(p.Agencies) || '<em>--</em>'}</div>
-        </div>
-        <div class="info-block">
-          <div class="label"><i class="fa-solid fa-location-dot"></i> Geografia</div>
-          <div class="value">${escapeHtml(p.Geography) || '<em>--</em>'}</div>
-        </div>
-      </div>
-
-      <!-- COLUNA DIREITA -->
-      <div>
-        <div class="info-block">
-          <div class="label"><i class="fa-solid fa-chart-pie"></i> Execução Financeira (USD)</div>
-          <div class="summary-grid" style="margin-top:8px; grid-template-columns: repeat(3, 1fr);">
-            <div class="summary-card">
-              <div class="label">Required</div>
-              <div class="value" style="font-size:18px;">${fmtMoney(p.TotalRequired)}</div>
-            </div>
-            <div class="summary-card">
-              <div class="label">Available</div>
-              <div class="value" style="font-size:18px;">${fmtMoney(p.TotalAvailable)}</div>
-            </div>
-            <div class="summary-card green">
-              <div class="label">Gasto</div>
-              <div class="value" style="font-size:18px;">${fmtMoney(p.TotalExpenditure)}</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="info-block">
-          <div class="label"><i class="fa-solid fa-percent"></i> Taxa de execução global</div>
-          <div class="pct-big">
-            <div class="pct-bar-wrap">
-              <div class="pct-bar"><div class="pct-bar-fill ${pctClass(pct)}" style="width:${Math.min(100,pct)}%"></div></div>
-              <span class="pct-num">${fmtPct(pct)}</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="info-block">
-          <div class="label"><i class="fa-solid fa-table-list"></i> Detalhe Anual</div>
-          ${yearsTable}
-        </div>
-      </div>
-
-      <!-- LINHA INFERIOR -->
-      <div class="full">
-        <div class="info-block">
-          <div class="label"><i class="fa-solid fa-hand-holding-dollar"></i> Doadores (Contributing Partners)</div>
-          <div class="value">
-            ${p.ContributingPartners.length ? p.ContributingPartners.map(d => `<span class="tag donor">${escapeHtml(d)}</span>`).join('') : '<em>--</em>'}
-          </div>
-        </div>
-        <div class="info-block">
-          <div class="label"><i class="fa-solid fa-people-group"></i> Parceiros de Implementação</div>
-          <div class="value">
-            ${p.ImplementationPartners.length ? p.ImplementationPartners.map(d => `<span class="tag partner">${escapeHtml(d)}</span>`).join('') : '<em>--</em>'}
-          </div>
-        </div>
-        <div class="info-block">
-          <div class="label"><i class="fa-solid fa-earth-africa"></i> SDG Goals</div>
-          <div class="value">
-            ${p.SDGGoals.length ? p.SDGGoals.map(s => {
-              const m = s.match(/^(\d{1,2})/);
-              const sdgNum = m ? m[1] : '';
-              return `<span class="tag sdg" data-sdg="${sdgNum}">${escapeHtml(s)}</span>`;
-            }).join('') : '<em>--</em>'}
-          </div>
-        </div>
-
-        <div class="actions">
-          <button class="btn primary" onclick="window.print()">
-            <i class="fa-solid fa-file-pdf"></i> Exportar como PDF
-          </button>
-          <button class="btn" onclick="copyProjectSummary('${escapeHtml(p.ID)}')">
-            <i class="fa-solid fa-copy"></i> Copiar resumo
-          </button>
-        </div>
-      </div>
-    </div>
-  `;
-
-  document.getElementById('projectEmpty').style.display = 'none';
-  document.getElementById('projectDetail').style.display = 'block';
-}
-
-function copyProjectSummary(id) {
-  const p = DATA.find(x => x.ID === id);
-  if (!p) return;
-  const pct = p.TotalAvailable > 0 ? (p.TotalExpenditure / p.TotalAvailable) * 100 : 0;
-  const txt =
-`PROJETO ${p.ID}
-${p.Description}
-
-Status: ${p.Status}
-Período: ${p.StartDate} → ${p.EndDate}
-Focal Users: ${p.FocalUsers.join(', ')}
-Agências: ${p.Agencies}
-
-FINANCEIRO (USD):
-  Required:  ${fmtMoney(p.TotalRequired)}
-  Available: ${fmtMoney(p.TotalAvailable)}
-  Gasto:     ${fmtMoney(p.TotalExpenditure)}
-  % Gasta:   ${fmtPct(pct)}
-
-Doadores: ${p.ContributingPartners.join('; ')}
-Parceiros: ${p.ImplementationPartners.join('; ')}
-SDGs: ${p.SDGGoals.join('; ')}
-Prioridade: ${p.StrategicPriorityCode} — ${p.StrategicPriority}`;
-
-  navigator.clipboard.writeText(txt).then(() => {
-    alert('Resumo copiado para a área de transferência!');
-  });
-}
-
-/* =========================================================
-   EVENTOS
-   ========================================================= */
-// Upload (label trata do clique nativamente; aqui só drag & drop sobre a barra)
-const dropZone = document.getElementById('dropZone');
-const uploadBtn = document.getElementById('uploadBtn');
-const fileInput = document.getElementById('fileInput');
-
-fileInput.addEventListener('change', e => {
-  if (e.target.files[0]) loadCSV(e.target.files[0]);
-});
-['dragover','dragenter'].forEach(ev =>
-  dropZone.addEventListener(ev, e => { e.preventDefault(); uploadBtn.classList.add('dragover'); })
-);
-['dragleave','drop'].forEach(ev =>
-  dropZone.addEventListener(ev, e => { e.preventDefault(); uploadBtn.classList.remove('dragover'); })
-);
-dropZone.addEventListener('drop', e => {
-  if (e.dataTransfer.files[0]) loadCSV(e.dataTransfer.files[0]);
-});
-// Permitir drag & drop em qualquer ponto do ecrã também (mais conveniente)
-['dragover','dragenter'].forEach(ev =>
-  document.body.addEventListener(ev, e => { e.preventDefault(); uploadBtn.classList.add('dragover'); })
-);
-document.body.addEventListener('drop', e => {
-  e.preventDefault();
-  uploadBtn.classList.remove('dragover');
-  if (e.dataTransfer.files[0]) loadCSV(e.dataTransfer.files[0]);
-});
-
-// Tabs
-document.querySelectorAll('.tab').forEach(t => {
-  t.addEventListener('click', () => {
-    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(x => x.classList.remove('active'));
-    t.classList.add('active');
-    document.getElementById('tab-' + t.dataset.tab).classList.add('active');
-  });
-});
-
-// Filtros tab 1
-['focalSelect','yearSelect','statusSelect'].forEach(id =>
-  document.getElementById(id).addEventListener('change', renderFocalReport)
-);
-
-// Linhas clicáveis -> abrir ficha do projeto
-function openProject(id) {
-  // muda para a tab 2
-  document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
-  document.querySelectorAll('.tab-content').forEach(x => x.classList.remove('active'));
-  document.querySelector('.tab[data-tab="project"]').classList.add('active');
-  document.getElementById('tab-project').classList.add('active');
-  // seleciona o projeto e renderiza
-  const sel = document.getElementById('projectSelect');
-  if ([...sel.options].some(o => o.value === id)) sel.value = id;
-  renderProjectDetail(id);
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-document.querySelector('#projectTable tbody').addEventListener('click', e => {
-  const tr = e.target.closest('tr[data-id]');
-  if (tr) openProject(tr.dataset.id);
-});
-
-// Tab 2
-document.getElementById('projectSelect').addEventListener('change', e => {
-  if (e.target.value) renderProjectDetail(e.target.value);
-});
-document.getElementById('projectSearch').addEventListener('input', e => {
-  const id = e.target.value.trim();
-  const p = DATA.find(x => x.ID === id);
-  if (p) {
-    document.getElementById('projectSelect').value = id;
-    renderProjectDetail(id);
-  }
-});
-
-/* =========================================================
-   DADOS DEMO (fallback)
-   ========================================================= */
-const DEMO_CSV = `ID,Description,Focal users,Start date,End date,Status,Strategic priority code,Strategic priority,Outcome code,Output code,Geography,Agencies,Agency abbreviations,Contributing partners,Implementation partners,SDG Goals,Total required resources,Total available resources,Total expenditure resources,2023 Required,2023 Available,2023 Expenditure,2023 Narrative,2024 Required,2024 Available,2024 Expenditure,2024 Narrative,2025 Required,2025 Available,2025 Expenditure,2025 Narrative,2026 Required,2026 Available,2026 Expenditure,2026 Narrative
-108631,"Apoio à formação em educação financeira e empreendedorismo para imigrantes","Sara Brigham",2023-01-01,2024-12-31,Closed,SP 2,"Transformação Económica Inclusiva",2.1,2.1.4,"Cabo Verde (Praia)","International Organization for Migration",IOM,"IOM Development Fund","AAI; CM Praia; Plataforma Comunidades Africanas","4 Quality Education; 8 Decent Jobs",109422,109422,75497,85000,85000,62169,"Salas de formação criadas no Parque 5 de Julho. Concurso Start-ups Imigrantes lançado.",24422,24422,13328,"Formações TOP30 realizadas. TOP10 iniciaram fase de incubação em Agosto 2024.",,,,,,,,,
-108554,"Projeto OYA - aumento da empregabilidade jovem","Katya Mascarenhas Neves; Edson Fernandes",2023-01-01,2023-12-31,Closed,SP 2,"Transformação Económica",2.1,2.1.3,"Cabo Verde","UNDP",UNDP,"Core Funding","MAA; MICE","1 No Poverty; 8 Decent Jobs; 9 Industry",80000,80000,20486,80000,80000,20486,"Diagnóstico inicial concluído. Formações lançadas para jovens.",,,,,,,,,,,,
-108676,"Reforço de instituições públicas em direitos humanos","Frederic Mbassa; Ulrike Mbuton",2023-03-01,2024-12-31,Closed,SP 3,"Governança e Estado de Direito",3.2,3.2.1,"Cabo Verde","OHCHR",OHCHR,"Core Funding","CNDHC; Ministry of Justice","16 Peace and Justice",312000,292000,292000,105000,85000,85000,"Capacitação de magistrados e oficiais de justiça.",207000,207000,207000,"Plano nacional de DH lançado.",,,,,,,,,
-108892,"Programa de transição energética nas ilhas","Sara Brigham; Maria Tavares",2024-01-01,2026-12-31,Implementation,SP 2,"Transição Justa",2.2,2.2.1,"Cabo Verde (todas as ilhas)","UNDP",UNDP,"GEF; EU","MAA; INMG","7 Affordable Energy; 13 Climate Action",450000,380000,156000,,,,,150000,150000,98000,"Estudos de viabilidade concluídos em Santo Antão e São Vicente.",200000,180000,58000,"Instalação de painéis solares em 3 escolas piloto.",100000,50000,0,"Em pipeline."
-108925,"Empoderamento das mulheres rurais","Katya Mascarenhas Neves",2024-06-01,2027-05-31,Implementation,SP 1,"Inclusão e Equidade",1.3,1.3.2,"Cabo Verde (Santiago, Fogo)","UN Women",UNWOMEN,"Sweden; Spain","ICIEG; ONG locais","5 Gender Equality; 1 No Poverty",280000,210000,67500,,,,,80000,80000,42500,"Formações em liderança realizadas em 4 comunidades.",100000,80000,25000,"Cooperativas femininas criadas em Santa Cruz.",50000,30000,0,
-108950,"Apoio à modernização do registo civil","Sara Brigham",2025-01-01,2026-12-31,Pipeline,SP 3,"Governança",3.1,3.1.2,"Cabo Verde","UNICEF",UNICEF,"Pipeline","DGRN","16 Peace and Justice",180000,0,0,,,,,,,,,90000,0,0,"Aguarda mobilização de recursos.",90000,0,0,
-108999,"Saúde materna e infantil","Frederic Mbassa",2023-01-01,2025-12-31,Cancelled,SP 1,"Saúde",1.1,1.1.1,"Cabo Verde","WHO",WHO,"Core Funding","Ministério da Saúde","3 Good Health",150000,75000,0,50000,25000,0,"Cancelado por reformulação programática.",,,,,,,,,,,,`;
-
-// Carrega demo automaticamente
-window.addEventListener('DOMContentLoaded', () => {
-  Papa.parse(DEMO_CSV, {
-    header: true,
-    skipEmptyLines: true,
-    transformHeader: h => h.trim(),
-    complete: (res) => {
-      DATA = res.data
-        .filter(r => r.ID && String(r.ID).trim() !== '')
-        .map(r => ({
-          ID: String(r.ID).trim(),
-          Description: (r.Description || '').trim(),
-          Status: (r.Status || '').trim(),
-          StartDate: (r['Start date'] || '').trim(),
-          EndDate: (r['End date'] || '').trim(),
-          Agencies: (r.Agencies || '').trim(),
-          AgencyAbbr: (r['Agency abbreviations'] || '').trim(),
-          FocalUsers: splitMulti(r['Focal users']),
-          ContributingPartners: splitMulti(r['Contributing partners']),
-          ImplementationPartners: splitMulti(r['Implementation partners']),
-          SDGGoals: splitMulti(r['SDG Goals']),
-          StrategicPriority: (r['Strategic priority'] || '').trim(),
-          StrategicPriorityCode: (r['Strategic priority code'] || '').trim(),
-          OutcomeCode: (r['Outcome code'] || '').trim(),
-          OutputCode: (r['Output code'] || '').trim(),
-          Geography: (r.Geography || '').trim(),
-          TotalRequired: num(r['Total required resources']),
-          TotalAvailable: num(r['Total available resources']),
-          TotalExpenditure: num(r['Total expenditure resources']),
-          years: Object.fromEntries(YEARS.map(y => [y, {
-            required: num(r[`${y} Required`]),
-            available: num(r[`${y} Available`]),
-            expenditure: num(r[`${y} Expenditure`]),
-            narrative: (r[`${y} Narrative`] || '').trim()
-          }]))
-        }));
-      const set = new Set();
-      DATA.forEach(p => p.FocalUsers.forEach(u => set.add(u)));
-      FOCAL_USERS = Array.from(set).sort((a,b) => a.localeCompare(b, 'pt'));
-      populateFilters();
-      const fi = document.getElementById('fileInfo');
-      fi.classList.add('demo');
-      fi.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Modo demo · ' + DATA.length + ' projetos';
-    }
-  });
-});
-</script>
-
-</body>
-</html>
+    FOCAL_USERS.map(u => `<option value="${escapeHtml
