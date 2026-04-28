@@ -1225,65 +1225,63 @@ document.getElementById('projectSearch').addEventListener('input', e => {
   }
 });
 
-// Carrega automaticamente do ficheiro CSV que está no GitHub
-const CSV_URL = 'https://raw.githubusercontent.com/silvasofiacv/UN-INFO-CABO-VERDE/main/export_2026-04-28.csv';
+/* =========================================================
+   DADOS DEMO (fallback)
+   ========================================================= */
+const DEMO_CSV = `ID,Description,Focal users,Start date,End date,Status,Strategic priority code,Strategic priority,Outcome code,Output code,Geography,Agencies,Agency abbreviations,Contributing partners,Implementation partners,SDG Goals,Total required resources,Total available resources,Total expenditure resources,2023 Required,2023 Available,2023 Expenditure,2023 Narrative,2024 Required,2024 Available,2024 Expenditure,2024 Narrative,2025 Required,2025 Available,2025 Expenditure,2025 Narrative,2026 Required,2026 Available,2026 Expenditure,2026 Narrative
+108631,"Apoio à formação em educação financeira e empreendedorismo para imigrantes","Sara Brigham",2023-01-01,2024-12-31,Closed,SP 2,"Transformação Económica Inclusiva",2.1,2.1.4,"Cabo Verde (Praia)","International Organization for Migration",IOM,"IOM Development Fund","AAI; CM Praia; Plataforma Comunidades Africanas","4 Quality Education; 8 Decent Jobs",109422,109422,75497,85000,85000,62169,"Salas de formação criadas no Parque 5 de Julho. Concurso Start-ups Imigrantes lançado.",24422,24422,13328,"Formações TOP30 realizadas. TOP10 iniciaram fase de incubação em Agosto 2024.",,,,,,,,,
+108554,"Projeto OYA - aumento da empregabilidade jovem","Katya Mascarenhas Neves; Edson Fernandes",2023-01-01,2023-12-31,Closed,SP 2,"Transformação Económica",2.1,2.1.3,"Cabo Verde","UNDP",UNDP,"Core Funding","MAA; MICE","1 No Poverty; 8 Decent Jobs; 9 Industry",80000,80000,20486,80000,80000,20486,"Diagnóstico inicial concluído. Formações lançadas para jovens.",,,,,,,,,,,,
+108676,"Reforço de instituições públicas em direitos humanos","Frederic Mbassa; Ulrike Mbuton",2023-03-01,2024-12-31,Closed,SP 3,"Governança e Estado de Direito",3.2,3.2.1,"Cabo Verde","OHCHR",OHCHR,"Core Funding","CNDHC; Ministry of Justice","16 Peace and Justice",312000,292000,292000,105000,85000,85000,"Capacitação de magistrados e oficiais de justiça.",207000,207000,207000,"Plano nacional de DH lançado.",,,,,,,,,
+108892,"Programa de transição energética nas ilhas","Sara Brigham; Maria Tavares",2024-01-01,2026-12-31,Implementation,SP 2,"Transição Justa",2.2,2.2.1,"Cabo Verde (todas as ilhas)","UNDP",UNDP,"GEF; EU","MAA; INMG","7 Affordable Energy; 13 Climate Action",450000,380000,156000,,,,,150000,150000,98000,"Estudos de viabilidade concluídos em Santo Antão e São Vicente.",200000,180000,58000,"Instalação de painéis solares em 3 escolas piloto.",100000,50000,0,"Em pipeline."
+108925,"Empoderamento das mulheres rurais","Katya Mascarenhas Neves",2024-06-01,2027-05-31,Implementation,SP 1,"Inclusão e Equidade",1.3,1.3.2,"Cabo Verde (Santiago, Fogo)","UN Women",UNWOMEN,"Sweden; Spain","ICIEG; ONG locais","5 Gender Equality; 1 No Poverty",280000,210000,67500,,,,,80000,80000,42500,"Formações em liderança realizadas em 4 comunidades.",100000,80000,25000,"Cooperativas femininas criadas em Santa Cruz.",50000,30000,0,
+108950,"Apoio à modernização do registo civil","Sara Brigham",2025-01-01,2026-12-31,Pipeline,SP 3,"Governança",3.1,3.1.2,"Cabo Verde","UNICEF",UNICEF,"Pipeline","DGRN","16 Peace and Justice",180000,0,0,,,,,,,,,90000,0,0,"Aguarda mobilização de recursos.",90000,0,0,
+108999,"Saúde materna e infantil","Frederic Mbassa",2023-01-01,2025-12-31,Cancelled,SP 1,"Saúde",1.1,1.1.1,"Cabo Verde","WHO",WHO,"Core Funding","Ministério da Saúde","3 Good Health",150000,75000,0,50000,25000,0,"Cancelado por reformulação programática.",,,,,,,,,,,,`;
 
+// Carrega demo automaticamente
 window.addEventListener('DOMContentLoaded', () => {
-  fetch(CSV_URL)
-    .then(response => {
-      if (!response.ok) throw new Error('Ficheiro CSV não encontrado no GitHub');
-      return response.text();
-    })
-    .then(csvText => {
-      Papa.parse(csvText, {
-        header: true,
-        skipEmptyLines: true,
-        transformHeader: h => h.trim(),
-        complete: (res) => {
-          DATA = res.data
-            .filter(r => r.ID && String(r.ID).trim() !== '')
-            .map(r => ({
-              ID: String(r.ID).trim(),
-              Description: (r.Description || '').trim(),
-              Status: (r.Status || '').trim(),
-              StartDate: (r['Start date'] || '').trim(),
-              EndDate: (r['End date'] || '').trim(),
-              Agencies: (r.Agencies || '').trim(),
-              AgencyAbbr: (r['Agency abbreviations'] || '').trim(),
-              FocalUsers: splitMulti(r['Focal users']),
-              ContributingPartners: splitMulti(r['Contributing partners']),
-              ImplementationPartners: splitMulti(r['Implementation partners']),
-              SDGGoals: splitMulti(r['SDG Goals']),
-              StrategicPriority: (r['Strategic priority'] || '').trim(),
-              StrategicPriorityCode: (r['Strategic priority code'] || '').trim(),
-              OutcomeCode: (r['Outcome code'] || '').trim(),
-              OutputCode: (r['Output code'] || '').trim(),
-              Geography: (r.Geography || '').trim(),
-              TotalRequired: num(r['Total required resources']),
-              TotalAvailable: num(r['Total available resources']),
-              TotalExpenditure: num(r['Total expenditure resources']),
-              years: Object.fromEntries(YEARS.map(y => [y, {
-                required: num(r[`${y} Required`]),
-                available: num(r[`${y} Available`]),
-                expenditure: num(r[`${y} Expenditure`]),
-                narrative: (r[`${y} Narrative`] || '').trim()
-              }]))
-            }));
-          const set = new Set();
-          DATA.forEach(p => p.FocalUsers.forEach(u => set.add(u)));
-          FOCAL_USERS = Array.from(set).sort((a,b) => a.localeCompare(b, 'pt'));
-          populateFilters();
-          const fi = document.getElementById('fileInfo');
-          fi.classList.remove('demo');
-          fi.innerHTML = `<i class="fa-solid fa-circle-check"></i> Dados carregados do GitHub · ${DATA.length} projetos`;
-        }
-      });
-    })
-    .catch(error => {
-      console.error('Erro ao carregar CSV:', error);
-      // Fallback para dados demo se o CSV não carregar
-      document.getElementById('fileInfo').innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Demo (CSV não encontrado)';
-    });
+  Papa.parse(DEMO_CSV, {
+    header: true,
+    skipEmptyLines: true,
+    transformHeader: h => h.trim(),
+    complete: (res) => {
+      DATA = res.data
+        .filter(r => r.ID && String(r.ID).trim() !== '')
+        .map(r => ({
+          ID: String(r.ID).trim(),
+          Description: (r.Description || '').trim(),
+          Status: (r.Status || '').trim(),
+          StartDate: (r['Start date'] || '').trim(),
+          EndDate: (r['End date'] || '').trim(),
+          Agencies: (r.Agencies || '').trim(),
+          AgencyAbbr: (r['Agency abbreviations'] || '').trim(),
+          FocalUsers: splitMulti(r['Focal users']),
+          ContributingPartners: splitMulti(r['Contributing partners']),
+          ImplementationPartners: splitMulti(r['Implementation partners']),
+          SDGGoals: splitMulti(r['SDG Goals']),
+          StrategicPriority: (r['Strategic priority'] || '').trim(),
+          StrategicPriorityCode: (r['Strategic priority code'] || '').trim(),
+          OutcomeCode: (r['Outcome code'] || '').trim(),
+          OutputCode: (r['Output code'] || '').trim(),
+          Geography: (r.Geography || '').trim(),
+          TotalRequired: num(r['Total required resources']),
+          TotalAvailable: num(r['Total available resources']),
+          TotalExpenditure: num(r['Total expenditure resources']),
+          years: Object.fromEntries(YEARS.map(y => [y, {
+            required: num(r[`${y} Required`]),
+            available: num(r[`${y} Available`]),
+            expenditure: num(r[`${y} Expenditure`]),
+            narrative: (r[`${y} Narrative`] || '').trim()
+          }]))
+        }));
+      const set = new Set();
+      DATA.forEach(p => p.FocalUsers.forEach(u => set.add(u)));
+      FOCAL_USERS = Array.from(set).sort((a,b) => a.localeCompare(b, 'pt'));
+      populateFilters();
+      const fi = document.getElementById('fileInfo');
+      fi.classList.add('demo');
+      fi.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Modo demo · ' + DATA.length + ' projetos';
+    }
+  });
 });
 </script>
 
