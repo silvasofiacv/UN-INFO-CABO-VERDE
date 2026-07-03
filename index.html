@@ -1019,6 +1019,7 @@ function toggleReportSDGs(){
 //  DATA & UTILS
 // ═══════════════════════════════════════
 let PROJECTS_DATA = [];
+let DATA_LOADED_AT_LABEL = '';
 let INDICATORS_DATA = [];
 let INDICATOR_VISIBLE_FIELDS = [];
 const INDICATOR_FIELDS = ["outcome","output","indicators","description","start date","end date","unit","baseline","target 2023","reached 2023","narrative 2023","target 2024","reached 2024","narrative 2024","target 2025","reached 2025","narrative 2025","target 2026","reached 2026","narrative 2026","target 2027","reached 2027","narrative 2027","Means of Verification","sdg","agency abbreviations","agencies"];
@@ -1949,7 +1950,7 @@ function renderReport(){
     getFocalUsers(p).forEach(f=>focalSet.add(f));
   });
 
-  document.getElementById('reportDate').innerHTML=`<i class="fa-regular fa-clock"></i> ${t('reportUpdated')}: ${new Date().toLocaleString('pt-PT')}`;
+  document.getElementById('reportDate').innerHTML=`<i class="fa-regular fa-clock"></i> ${t('reportUpdated')}: ${DATA_LOADED_AT_LABEL || new Date().toLocaleString('pt-PT')}`;
   document.getElementById('reportKpis').innerHTML=`
     <div class="report-card span-3"><div class="report-label">${t('reportTotalProjects')}</div><div class="report-value">${totalProjects}</div><div class="report-note">${reportYear}</div></div>
     <div class="report-card span-3"><div class="report-label">${t('reportTotalAvailable')}</div><div class="report-value">${fmtMoney(totalAvailable)}</div><div class="report-note">USD</div></div>
@@ -2097,9 +2098,10 @@ function loadDataFromArray(arr, loadedAtLabel){
     "PEDS II – Programmes": p["peds"]||p["PEDS II – Programmes"]||'',
     "Agency specific Project / Programme / Portfolio": p["port"]||p["Agency specific Project / Programme / Portfolio"]||'',
   }));
+  DATA_LOADED_AT_LABEL = loadedAtLabel || new Date().toLocaleString('pt-PT');
   updateFocalSelect(); updateProjectSelect(); updateAgencySelect(); renderReport(); renderFocalReport();
   document.getElementById('uploadStatus').innerHTML=`<i class="fa-solid fa-circle-check" style="color:#10B981;"></i> ${PROJECTS_DATA.length} Suboutputs`;
-  document.getElementById('lastUpdateInfo').innerHTML=`<i class="fa-regular fa-clock"></i> ${loadedAtLabel || new Date().toLocaleString('pt-PT')} · ${PROJECTS_DATA.length} registos`;
+  document.getElementById('lastUpdateInfo').innerHTML=`<i class="fa-regular fa-clock"></i> ${DATA_LOADED_AT_LABEL} · ${PROJECTS_DATA.length} registos`;
 }
 
 // ═══════════════════════════════════════
