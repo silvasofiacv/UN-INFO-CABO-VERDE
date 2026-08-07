@@ -849,6 +849,7 @@ const I18N = {
     reportUpdated:'Atualizado em',
     reportTotalProjects:'Suboutputs',
     reportTotalAvailable:'Disponível total',
+    reportAvailableRemaining:'Disponível por gastar',
     reportTotalExpenditure:'Despesa total',
     reportExecution:'Execução financeira',
     reportAgencies:'Agências',
@@ -923,6 +924,7 @@ const I18N = {
     reportUpdated:'Updated on',
     reportTotalProjects:'Suboutputs',
     reportTotalAvailable:'Total available',
+    reportAvailableRemaining:'Available (not yet spent)',
     reportTotalExpenditure:'Total expenditure',
     reportExecution:'Financial execution',
     reportAgencies:'Agencies',
@@ -2070,7 +2072,7 @@ function renderReport(){
     data:{
       labels:agencyEntries.map(x=>x[0]),
       datasets:[
-        {label:t('reportTotalAvailable'),data:agencyEntries.map(x=>Math.max(0,x[1].available-x[1].spent)),backgroundColor:'#BFE7F7',borderRadius:7,stack:'finance'},
+        {label:t('reportAvailableRemaining'),data:agencyEntries.map(x=>Math.max(0,x[1].available-x[1].spent)),backgroundColor:'#BFE7F7',borderRadius:7,stack:'finance'},
         {label:t('reportTotalExpenditure'),data:agencyEntries.map(x=>x[1].spent),backgroundColor:'#006BB3',borderRadius:7,stack:'finance'}
       ]
     },
@@ -2494,42 +2496,70 @@ loadIndicatorsFromArray([{"outcome":"Efeito 3.1: Até 2027, mais pessoas, especi
 renderIndicatorsReport();
 
 /* ==========================================================================
-   ATUALIZACAO AUTOMATICA A PARTIR DA PASTA "dados"
+   ATUALIZACAO AUTOMATICA DOS DADOS
    --------------------------------------------------------------------------
-   A pagina le sozinha os CSV que estiverem na pasta "dados", ao lado deste
-   ficheiro. Para atualizar o dashboard NAO e preciso mexer em codigo: basta
-   substituir o CSV correspondente na pasta "dados" do repositorio GitHub.
+   A pagina procura sozinha os ficheiros CSV no repositorio e identifica cada
+   um PELAS COLUNAS, nao pelo nome. Isto significa que:
 
-       dados/suboutputs.csv           -> sub-outputs e execucao financeira
-       dados/financeiro-agencias.csv  -> repartição por agencia
-       dados/indicadores.csv          -> indicadores
+     - o nome do ficheiro NAO importa (podes deixar o nome da exportacao do
+       UN INFO, com data e tudo);
+     - podes por os CSV na pasta "dados" OU na raiz do repositorio;
+     - so precisas de substituir o ficheiro que mudou.
 
-   Se um ficheiro faltar, estiver vazio ou invalido, a pagina NAO fica em
-   branco: continua a mostrar os dados embebidos acima. O botao "Carregar CSV"
-   tambem continua a funcionar para consultas pontuais sem tocar no GitHub.
+   Como identifica cada ficheiro:
+     coluna "indicators" + "baseline"          -> indicadores
+     coluna "3-id" + "5-1-agency-abbreviation" -> financeiro por agencia
+     coluna "ID"                               -> sub-outputs
+
+   Se nao encontrar nada, ou se algo falhar, a pagina NAO fica em branco:
+   continua a mostrar os dados embebidos acima. O botao "Carregar CSV"
+   tambem continua a funcionar para consultas pontuais.
    ========================================================================== */
 (function(){
-  var FICHEIROS = ['dados/suboutputs.csv','dados/financeiro-agencias.csv','dados/indicadores.csv'];
+  var NOMES_FIXOS = ['dados/suboutputs.csv','dados/financeiro-agencias.csv','dados/indicadores.csv',
+                     'dados/indicadores.CSV'];
 
-  function rotear(rows, label){
+  function tipoDe(rows){
     if(!rows || !rows.length) return null;
     var h = rows[0];
-    if(h['3-id']!==undefined && h['5-1-agency-abbreviation']!==undefined){
-      loadAgencyFundingRows(rows); return 'financeiro por agencia (' + rows.length + ' linhas)';
-    }
-    if(h['indicators']!==undefined && h['baseline']!==undefined){
-      loadIndicatorsFromArray(rows); renderIndicatorsReport();
-      return 'indicadores (' + rows.length + ')';
-    }
-    if(h['ID']!==undefined || h['id']!==undefined){
-      loadDataFromArray(rows, label); return 'sub-outputs (' + rows.length + ')';
-    }
+    if(h['3-id']!==undefined && h['5-1-agency-abbreviation']!==undefined) return 'financeiro';
+    if(h['indicators']!==undefined && h['baseline']!==undefined) return 'indicadores';
+    if(h['ID']!==undefined || h['id']!==undefined) return 'suboutputs';
     return null;
+  }
+
+  function aplicar(tipo, rows, label){
+    if(tipo==='financeiro'){ loadAgencyFundingRows(rows); return 'financeiro por agencia ('+rows.length+' linhas)'; }
+    if(tipo==='indicadores'){ loadIndicatorsFromArray(rows); renderIndicatorsReport(); return 'indicadores ('+rows.length+')'; }
+    if(tipo==='suboutputs'){ loadDataFromArray(rows, label); return 'sub-outputs ('+rows.length+')'; }
+    return null;
+  }
+
+  // Descobre owner/repo a partir do endereco, para continuar a funcionar
+  // mesmo que o repositorio seja transferido para outra conta.
+  function repo(){
+    var m = String(location.hostname||'').match(/^([^.]+)\.github\.io$/);
+    if(!m) return null;
+    var seg = String(location.pathname||'').split('/').filter(Boolean);
+    return { owner:m[1], nome: seg.length ? seg[0] : (m[1]+'.github.io') };
+  }
+
+  function listarPasta(pasta){                    // usa a API publica do GitHub
+    var r = repo(); if(!r) return Promise.resolve([]);
+    var url = 'https://api.github.com/repos/'+r.owner+'/'+r.nome+'/contents/'+pasta;
+    return fetch(url, {cache:'no-store'})
+      .then(function(x){ return x.ok ? x.json() : []; })
+      .then(function(j){
+        if(!Array.isArray(j)) return [];
+        return j.filter(function(f){ return f.type==='file' && /\.csv$/i.test(f.name); })
+                .map(function(f){ return (pasta? pasta+'/' : '') + f.name; });
+      })
+      .catch(function(){ return []; });
   }
 
   function lerCSV(url){
     return new Promise(function(resolve){
-      fetch(url + '?v=' + Date.now(), {cache:'no-store'})
+      fetch(encodeURI(url) + '?v=' + Date.now(), {cache:'no-store'})
         .then(function(r){
           if(!r.ok) throw new Error('404');
           var lm = r.headers.get('Last-Modified');
@@ -2537,31 +2567,45 @@ renderIndicatorsReport();
         })
         .then(function(d){
           var label = null;
-          if(d.modificado){ var dt = new Date(d.modificado); if(!isNaN(dt)) label = dt.toLocaleString('pt-PT'); }
+          if(d.modificado){ var dt=new Date(d.modificado); if(!isNaN(dt)) label = dt.toLocaleString('pt-PT'); }
           Papa.parse(d.texto, {header:true, skipEmptyLines:true,
-            complete:function(res){
-              try { resolve(rotear(res.data, label || new Date().toLocaleString('pt-PT'))); }
-              catch(e){ console.warn('[UN INFO] erro ao aplicar ' + url, e); resolve(null); }
-            },
-            error:function(){ resolve(null); }
-          });
+            complete:function(res){ resolve({rows:res.data, label:label, url:url}); },
+            error:function(){ resolve(null); }});
         })
         .catch(function(){ resolve(null); });
     });
   }
 
-  (function(){
-    var i = 0, feitos = [];
-    function proximo(){
-      if(i >= FICHEIROS.length){
-        if(feitos.length) console.info('[UN INFO] atualizado a partir da pasta /dados: ' + feitos.join(' | '));
-        else console.info('[UN INFO] pasta /dados indisponivel - a usar os dados embebidos no index.html.');
-        return;
-      }
-      lerCSV(FICHEIROS[i++]).then(function(r){ if(r) feitos.push(r); proximo(); });
-    }
-    proximo();
-  })();
+  Promise.all([listarPasta('dados'), listarPasta('')]).then(function(listas){
+    var candidatos = [];
+    listas[0].concat(listas[1]).concat(NOMES_FIXOS).forEach(function(u){
+      if(candidatos.indexOf(u) === -1) candidatos.push(u);
+    });
+
+    return Promise.all(candidatos.map(lerCSV)).then(function(resultados){
+      var porTipo = {};
+      resultados.forEach(function(r){
+        if(!r) return;
+        var t = tipoDe(r.rows);
+        // fica com o ficheiro que tiver mais linhas, se houver repetidos
+        if(t && (!porTipo[t] || r.rows.length > porTipo[t].rows.length)) porTipo[t] = r;
+      });
+
+      var feitos = [];
+      ['suboutputs','financeiro','indicadores'].forEach(function(t){   // esta ordem importa
+        if(!porTipo[t]) return;
+        try {
+          var msg = aplicar(t, porTipo[t].rows, porTipo[t].label || new Date().toLocaleString('pt-PT'));
+          if(msg) feitos.push(msg + ' <- ' + porTipo[t].url);
+        } catch(e){ console.warn('[UN INFO] erro ao aplicar ' + porTipo[t].url, e); }
+      });
+
+      if(feitos.length) console.info('[UN INFO] dados atualizados:\n  ' + feitos.join('\n  '));
+      else console.info('[UN INFO] nenhum CSV encontrado no repositorio - a usar os dados embebidos no index.html.');
+    });
+  }).catch(function(e){
+    console.info('[UN INFO] leitura automatica indisponivel - a usar os dados embebidos.', e);
+  });
 })();
 </script>
 </body>
