@@ -849,7 +849,7 @@ const I18N = {
     reportUpdated:'Atualizado em',
     reportTotalProjects:'Suboutputs',
     reportTotalAvailable:'Disponível total',
-    reportAvailableRemaining:'Disponível por gastar',
+    reportAvailableRemaining:'Por gastar',
     reportTotalExpenditure:'Despesa total',
     reportExecution:'Execução financeira',
     reportAgencies:'Agências',
@@ -924,7 +924,7 @@ const I18N = {
     reportUpdated:'Updated on',
     reportTotalProjects:'Suboutputs',
     reportTotalAvailable:'Total available',
-    reportAvailableRemaining:'Available (not yet spent)',
+    reportAvailableRemaining:'Not yet spent',
     reportTotalExpenditure:'Total expenditure',
     reportExecution:'Financial execution',
     reportAgencies:'Agencies',
@@ -2072,8 +2072,8 @@ function renderReport(){
     data:{
       labels:agencyEntries.map(x=>x[0]),
       datasets:[
-        {label:t('reportAvailableRemaining'),data:agencyEntries.map(x=>Math.max(0,x[1].available-x[1].spent)),backgroundColor:'#BFE7F7',borderRadius:7,stack:'finance'},
-        {label:t('reportTotalExpenditure'),data:agencyEntries.map(x=>x[1].spent),backgroundColor:'#006BB3',borderRadius:7,stack:'finance'}
+        {label:t('colExp'),data:agencyEntries.map(x=>x[1].spent),backgroundColor:'#006BB3',borderRadius:7,stack:'finance'},
+        {label:t('reportAvailableRemaining'),data:agencyEntries.map(x=>Math.max(0,x[1].available-x[1].spent)),backgroundColor:'#BFE7F7',borderRadius:7,stack:'finance'}
       ]
     },
     options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true,beginAtZero:true,grid:{color:'#EDF2F7'},ticks:{callback:v=>Math.round(v).toLocaleString('pt-PT')}},y:{stacked:true,ticks:{autoSkip:false}}},plugins:{legend:{position:'bottom',labels:{boxWidth:10,usePointStyle:true}},tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${fmtMoney(ctx.raw)} USD`,footer:items=>{const i=items[0].dataIndex;const f=agencyEntries[i][1];return `${t('colAvail')}: ${fmtMoney(f.available)} USD`;}}}}}
