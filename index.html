@@ -464,7 +464,7 @@
   <img class="ph-logo" src="MYUNINFOLOGO.png" alt="MY UN INFO">
   <div class="ph-text">
     <h2>UN INFO · Cabo Verde</h2>
-  <p>UNCF 2023–2027 · Project Sheet · <span id="printDate"></span></p>
+  <p>UNCF 2023–2027 · Sub-Output Sheet · <span id="printDate"></span></p>
   </div>
 </div>
 
@@ -502,7 +502,7 @@
   <div class="tabs no-print">
     <button class="tab-btn active" data-tab="focal"><i class="fa-regular fa-user"></i> <span data-i18n="tabFocal">Por Focal Point</span></button>
     <button class="tab-btn" data-tab="agency"><i class="fa-solid fa-building-un"></i> <span data-i18n="tabAgency">Por Agência</span></button>
-    <button class="tab-btn" data-tab="project"><i class="fa-regular fa-folder-open"></i> <span data-i18n="tabProject">Por Suboutput</span></button>
+    <button class="tab-btn" data-tab="project"><i class="fa-regular fa-folder-open"></i> <span data-i18n="tabProject">Por Sub-Output</span></button>
     <button class="tab-btn" data-tab="indicators"><i class="fa-solid fa-list-check"></i> <span data-i18n="tabIndicators">Indicadores</span></button>
     <button class="tab-btn" data-tab="report"><i class="fa-solid fa-chart-simple"></i> <span data-i18n="tabReport">UNCT Report</span></button>
   </div>
@@ -619,7 +619,7 @@
       </div>
     </div>
 
-    <div id="focalEmpty" class="panel empty-state"><span data-i18n="selectFocalMsg">Selecione um Focal Point para visualizar os Suboutputs.</span></div>
+    <div id="focalEmpty" class="panel empty-state"><span data-i18n="selectFocalMsg">Selecione um Focal Point para visualizar os Sub-Outputs.</span></div>
 
     <div id="focalReport" style="display:none;">
       <div class="summary-grid" id="focalSummary"></div>
@@ -654,7 +654,7 @@
         </div>
       </div>
       <div class="panel no-print">
-        <h2><i class="fa-regular fa-chart-bar"></i> <span data-i18n="chartTitle">Taxa de execução por Suboutput</span></h2>
+        <h2><i class="fa-regular fa-chart-bar"></i> <span data-i18n="chartTitle">Taxa de execução por Sub-Output</span></h2>
         <div class="chart-legend">
           <span class="legend-item"><span class="legend-dot high"></span><span data-i18n="legendHigh">70% ou mais</span></span>
           <span class="legend-item"><span class="legend-dot mid"></span><span data-i18n="legendMid">35% a 69%</span></span>
@@ -692,7 +692,7 @@
       </div>
     </div>
 
-    <div id="agencyEmpty" class="panel empty-state"><i class="fa-solid fa-building-un"></i><span data-i18n="selectAgencyMsg">Selecione uma Agência para visualizar os Suboutputs.</span></div>
+    <div id="agencyEmpty" class="panel empty-state"><i class="fa-solid fa-building-un"></i><span data-i18n="selectAgencyMsg">Selecione uma Agência para visualizar os Sub-Outputs.</span></div>
 
     <div id="agencyReport" style="display:none;">
       <div class="summary-grid" id="agencySummary"></div>
@@ -745,12 +745,12 @@
         <input type="text" id="projectSearch" placeholder="Ex: 108631">
       </div>
       <div class="filter-group">
-        <label data-i18n="selectProject">Selecionar Suboutput</label>
+        <label data-i18n="selectProject">Selecionar Sub-Output</label>
         <select id="projectSelect"></select>
       </div>
     </div>
     <div id="projectDetailPanel" style="display:none;"></div>
-    <div id="projectEmpty" class="panel empty-state"><i class="fa-regular fa-folder"></i><span data-i18n="selectProjectMsg">Selecione um Suboutput para ver a ficha completa.</span></div>
+    <div id="projectEmpty" class="panel empty-state"><i class="fa-regular fa-folder"></i><span data-i18n="selectProjectMsg">Selecione um Sub-Output para ver a ficha completa.</span></div>
   </div>
 </main>
 
@@ -812,44 +812,44 @@
 // ═══════════════════════════════════════
 const I18N = {
   pt: {
-    badge:'Dashboard de Suboutputs', sub:'Monitorização financeira e resultados · UNCF 2023–2027',
+    badge:'Dashboard de Sub-Outputs', sub:'Monitorização financeira e resultados · UNCF 2023–2027',
     lastLoad:'Último carregamento', loadCsv:'Carregar CSV',
-    tabReport:'UNCT Report', tabIndicators:'Indicadores', tabFocal:'Por Focal Point', tabProject:'Por Suboutput',
+    tabReport:'UNCT Report', tabIndicators:'Indicadores', tabFocal:'Por Focal Point', tabProject:'Por Sub-Output',
     filterFocal:'Focal Point', filterYear:'Ano', filterStatus:'Status',
     allYears:'Todos os anos', allStatus:'Todos', selectOne:'Selecione',
     btnDownload:'Download PDF',
-    selectFocalMsg:'Selecione um Focal Point para visualizar os Suboutputs.',
+    selectFocalMsg:'Selecione um Focal Point para visualizar os Sub-Outputs.',
     tblTitle:'Sub-Outputs', clickHint:'(clique na linha para ver detalhe)',
-    colDesc:'Sub-Output', colAgency:'Agência', colReq:'Necessário', colAvail:'Disponível', colExp:'Despesa', colPct:'% Despesa',
+    colDesc:'Sub-Output', colAgency:'Agência', colReq:'Orçamento necessário', colAvail:'Orçamento disponível', colExp:'Despesa', colPct:'% Despesa',
     total:'TOTAL',
-    chartTitle:'Taxa de execução por Suboutput',
+    chartTitle:'Taxa de execução por Sub-Output',
     legendHigh:'70% ou mais',
     legendMid:'35% a 69%',
     legendLow:'menos de 35%',
-    searchProject:'ID ou pesquisa', selectProject:'Selecionar Suboutput',
-    selectProjectMsg:'Selecione um Suboutput para ver a ficha completa.',
+    searchProject:'ID ou pesquisa', selectProject:'Selecionar Sub-Output',
+    selectProjectMsg:'Selecione um Sub-Output para ver a ficha completa.',
     devBy:'desenvolvido por',
-    cards:['Suboutputs','Necessário (USD)','Disponível (USD)','Despesa (USD)','Execução'],
-    projId:'ID do Suboutput', projDesc:'Descrição', projStatus:'Status', projPeriod:'Período',
+    cards:['Sub-Outputs','Orçamento necessário (USD)','Orçamento disponível (USD)','Despesa (USD)','Execução'],
+    projId:'ID do Sub-Output', projDesc:'Descrição', projStatus:'Status', projPeriod:'Período',
     projFocal:'Focal Points', projAgency:'Agência ONU', projGeo:'Geografia',
     finTitle:'Execução Financeira', annualTitle:'Detalhe Anual',
-    colNarr:'Narrativa', donors:'Doadores', partners:'Parceiros de Implementação', sdgs:'SDG Goals',
-    btnPdf:'Exportar PDF', btnCopy:'Copiar resumo', btnUnInfo:'Ver no UN-INFO',
-    noProjects:'Nenhum Suboutput encontrado com os filtros selecionados.',
+    colNarr:'Narrativa', donors:'Doadores', partners:'Parceiros de Implementação', sdgs:'Objetivos ODS',
+    btnPdf:'Exportar PDF', btnCopy:'Copiar resumo', btnUnInfo:'Ver no UN INFO',
+    noProjects:'Nenhum Sub-Output encontrado com os filtros selecionados.',
     copied:'Copiado!', copiedFail:'Não foi possível copiar.',
     pctGasto:'despesa',
     tabAgency:'Por Agência',
-    filterAgency:'Agência', selectAgencyMsg:'Selecione uma Agência para visualizar os Suboutputs.',
+    filterAgency:'Agência', selectAgencyMsg:'Selecione uma Agência para visualizar os Sub-Outputs.',
     reportTitle:'Resumo executivo UN INFO 2026',
-    reportSPValue:'Valor implementado por SP',
+    reportSPValue:'Valor implementado por Prioridade Estratégica',
     reportAgency:'Agências por financeiro',
     reportSP:'Prioridades estratégicas',
     reportSDG:'ODS',
     reportHighlights:'Sub-Outputs',
     reportUpdated:'Atualizado em',
-    reportTotalProjects:'Suboutputs',
-    reportTotalAvailable:'Disponível total',
-    reportAvailableRemaining:'Por gastar',
+    reportTotalProjects:'Sub-Outputs',
+    reportTotalAvailable:'Orçamento disponível total',
+    reportAvailableRemaining:'Orçamento disponível',
     reportTotalExpenditure:'Despesa total',
     reportExecution:'Execução financeira',
     reportAgencies:'Agências',
@@ -887,44 +887,44 @@ const I18N = {
     mPEDS:'PEDS II – Programas', mPortfolio:'Portfólio da Agência',
   },
   en: {
-    badge:'Suboutput Dashboard', sub:'Financial monitoring & results · UNCF 2023–2027',
+    badge:'Sub-Output Dashboard', sub:'Financial monitoring & results · UNCF 2023–2027',
     lastLoad:'Last loaded', loadCsv:'Upload CSV',
-    tabReport:'UNCT Report', tabIndicators:'Indicators', tabFocal:'By Focal Point', tabProject:'By Suboutput',
+    tabReport:'UNCT Report', tabIndicators:'Indicators', tabFocal:'By Focal Point', tabProject:'By Sub-Output',
     filterFocal:'Focal Point', filterYear:'Year', filterStatus:'Status',
     allYears:'All years', allStatus:'All', selectOne:'Select',
     btnDownload:'Download PDF',
-    selectFocalMsg:'Select a Focal Point to view Suboutputs.',
+    selectFocalMsg:'Select a Focal Point to view Sub-Outputs.',
     tblTitle:'Sub-Outputs', clickHint:'(click row for detail)',
-    colDesc:'Sub-Output', colAgency:'Agency', colReq:'Required', colAvail:'Available', colExp:'Expenditure', colPct:'% Spent',
+    colDesc:'Sub-Output', colAgency:'Agency', colReq:'Required budget', colAvail:'Available budget', colExp:'Expenditure', colPct:'% Spent',
     total:'TOTAL',
-    chartTitle:'Execution rate by Suboutput',
+    chartTitle:'Execution rate by Sub-Output',
     legendHigh:'70% or more',
     legendMid:'35% to 69%',
     legendLow:'less than 35%',
-    searchProject:'ID or search', selectProject:'Select Suboutput',
-    selectProjectMsg:'Select a Suboutput to view the full profile.',
+    searchProject:'ID or search', selectProject:'Select Sub-Output',
+    selectProjectMsg:'Select a Sub-Output to view the full profile.',
     devBy:'developed by',
-    cards:['Suboutputs','Required (USD)','Available (USD)','Expenditure (USD)','Execution'],
-    projId:'Suboutput ID', projDesc:'Description', projStatus:'Status', projPeriod:'Period',
+    cards:['Sub-Outputs','Required budget (USD)','Available budget (USD)','Expenditure (USD)','Execution'],
+    projId:'Sub-Output ID', projDesc:'Description', projStatus:'Status', projPeriod:'Period',
     projFocal:'Focal Points', projAgency:'UN Agency', projGeo:'Geography',
     finTitle:'Financial Execution', annualTitle:'Annual Detail',
     colNarr:'Narrative', donors:'Donors', partners:'Implementation Partners', sdgs:'SDG Goals',
-    btnPdf:'Export PDF', btnCopy:'Copy summary', btnUnInfo:'View on UN-INFO',
-    noProjects:'No Suboutputs found with the selected filters.',
+    btnPdf:'Export PDF', btnCopy:'Copy summary', btnUnInfo:'View on UN INFO',
+    noProjects:'No Sub-Outputs found with the selected filters.',
     copied:'Copied!', copiedFail:'Could not copy.',
     pctGasto:'spent',
     tabAgency:'By Agency',
-    filterAgency:'Agency', selectAgencyMsg:'Select an Agency to view Suboutputs.',
+    filterAgency:'Agency', selectAgencyMsg:'Select an Agency to view Sub-Outputs.',
     reportTitle:'UN INFO executive summary 2026',
-    reportSPValue:'Implemented value by SP',
+    reportSPValue:'Implemented value by Strategic Priority',
     reportAgency:'Agencies by finance',
     reportSP:'Strategic priorities',
     reportSDG:'SDGs',
     reportHighlights:'Sub-Outputs',
     reportUpdated:'Updated on',
-    reportTotalProjects:'Suboutputs',
-    reportTotalAvailable:'Total available',
-    reportAvailableRemaining:'Not yet spent',
+    reportTotalProjects:'Sub-Outputs',
+    reportTotalAvailable:'Total available budget',
+    reportAvailableRemaining:'Available budget',
     reportTotalExpenditure:'Total expenditure',
     reportExecution:'Financial execution',
     reportAgencies:'Agencies',
@@ -1144,7 +1144,7 @@ function loadAgencyFundingRows(rows){
   AGENCY_FUNDING=map;
   if(PROJECTS_DATA.length){ renderReport(); renderAgencyReport(); }
   const el=document.getElementById('uploadStatus');
-  if(el) el.innerHTML=`<i class="fa-solid fa-circle-check" style="color:#10B981;"></i> ${LANG==='en'?'Agency funding values loaded':'Valores por agência carregados'} (${Object.keys(map).length} Suboutputs)`;
+  if(el) el.innerHTML=`<i class="fa-solid fa-circle-check" style="color:#10B981;"></i> ${LANG==='en'?'Agency funding values loaded':'Valores por agência carregados'} (${Object.keys(map).length} Sub-Outputs)`;
 }
 function markerNumber(v){ const m=String(v||'').match(/^\s*(\d+)/); return m?Number(m[1]):null; }
 function getNarr(p,year){ return p[`${year} Narrative`]||''; }
@@ -1542,7 +1542,7 @@ function renderAgencyReport(){
             label:ctx=>ctx.dataset.label+': '+fmtMoneyDash(ctx.raw)+' USD',
             afterBody:items=>{
               const row=focalRows[items[0].dataIndex]?.[1];
-              return row ? row.count+' Suboutputs' : '';
+              return row ? row.count+' Sub-Outputs' : '';
             }
           }}
         }
@@ -1602,7 +1602,7 @@ function renderSDGFinanceList(entries, totalEntries){
     const availablePct=(item.available/maxAvailable)*100;
     const spentPct=item.available>0?(item.spent/item.available)*100:0;
     return `<div class="report-sdg-item" role="button" tabindex="0" onclick="openSDGProjects(${item.number})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openSDGProjects(${item.number});}">
-      <div class="report-list-row"><strong>${item.label}</strong><span>${item.count} ${LANG==='en'?'Suboutputs':'Suboutputs'}</span></div>
+      <div class="report-list-row"><strong>${item.label}</strong><span>${item.count} ${LANG==='en'?'Sub-Outputs':'Sub-Outputs'}</span></div>
       <div class="report-fin-track" title="${t('colAvail')}: ${fmtMoney(item.available)} USD · ${t('colExp')}: ${fmtMoney(item.spent)} USD">
         <div class="report-fin-available" style="width:${Math.min(100,availablePct)}%">
           <span style="width:${Math.min(100,spentPct)}%"></span>
@@ -1634,7 +1634,7 @@ function openSDGProjects(sdgNo){
   const total=rows.reduce((a,r)=>({req:a.req+r.req,avail:a.avail+r.avail,exp:a.exp+r.exp}),{req:0,avail:0,exp:0});
   const totalPct=total.avail>0?(total.exp/total.avail)*100:0;
   document.getElementById('sdgModalTitle').textContent=label;
-  document.getElementById('sdgModalSub').textContent=`${rows.length} ${LANG==='en'?'Suboutputs':'Suboutputs'} · ${reportYear}`;
+  document.getElementById('sdgModalSub').textContent=`${rows.length} ${LANG==='en'?'Sub-Outputs':'Sub-Outputs'} · ${reportYear}`;
   document.querySelector('#sdgProjectsTable tbody').innerHTML=rows.map(r=>`
     <tr data-id="${r.p.ID}" onclick="closeSDGProjectsModal();switchToProject('${r.p.ID}')">
       <td><strong>${r.p.ID}</strong></td>
@@ -2161,7 +2161,7 @@ function loadDataFromArray(arr, loadedAtLabel){
   }));
   DATA_LOADED_AT_LABEL = loadedAtLabel || new Date().toLocaleString('pt-PT');
   updateFocalSelect(); updateProjectSelect(); updateAgencySelect(); renderReport(); renderFocalReport();
-  document.getElementById('uploadStatus').innerHTML=`<i class="fa-solid fa-circle-check" style="color:#10B981;"></i> ${PROJECTS_DATA.length} Suboutputs`;
+  document.getElementById('uploadStatus').innerHTML=`<i class="fa-solid fa-circle-check" style="color:#10B981;"></i> ${PROJECTS_DATA.length} Sub-Outputs`;
   document.getElementById('lastUpdateInfo').innerHTML=`<i class="fa-regular fa-clock"></i> ${DATA_LOADED_AT_LABEL} · ${PROJECTS_DATA.length} registos`;
 }
 
@@ -2278,7 +2278,7 @@ function buildFocalSupervisorReport(){
     <td class="num">${fmtPct(r.pct)}</td>
   </tr>`).join('');
   const agencyHtml=agencyRows.map(([name,v])=>`<div class="sup-bar-row">
-    <div class="sup-bar-head"><strong>${escHtml(name)}</strong><span>${fmtMoneyDash(v.avail)} USD · ${v.count} Suboutputs</span></div>
+    <div class="sup-bar-head"><strong>${escHtml(name)}</strong><span>${fmtMoneyDash(v.avail)} USD · ${v.count} Sub-Outputs</span></div>
     <div class="sup-track"><span class="sup-fill" style="width:${Math.min(100,(v.avail/maxAgency)*100)}%"></span></div>
   </div>`).join('');
   const topRows=rows.slice(0,5).map(r=>`<div class="sup-bar-row">
@@ -2298,7 +2298,7 @@ function buildFocalSupervisorReport(){
       </div>
     </div>
     <div class="sup-kpis">
-      <div class="sup-kpi"><div class="sup-kpi-label">Suboutputs</div><div class="sup-kpi-value">${rows.length}</div></div>
+      <div class="sup-kpi"><div class="sup-kpi-label">Sub-Outputs</div><div class="sup-kpi-value">${rows.length}</div></div>
       <div class="sup-kpi"><div class="sup-kpi-label">${t('colReq')}</div><div class="sup-kpi-value">${fmtMoney(total.req)}</div></div>
       <div class="sup-kpi"><div class="sup-kpi-label">${t('colAvail')}</div><div class="sup-kpi-value">${fmtMoney(total.avail)}</div></div>
       <div class="sup-kpi"><div class="sup-kpi-label">${t('colExp')}</div><div class="sup-kpi-value">${fmtMoney(total.exp)}</div></div>
@@ -2308,13 +2308,13 @@ function buildFocalSupervisorReport(){
       <h2>Leitura executiva</h2>
       <div class="sup-insights">
         <div class="sup-note">
-          <strong>${escHtml(focal)}</strong> tem ${rows.length} Suboutputs no filtro selecionado, com ${fmtMoney(total.avail)} USD disponíveis face a ${fmtMoney(total.req)} USD necessários (${Math.round(availableRate)}% de cobertura). A despesa reportada é ${fmtMoney(total.exp)} USD, equivalente a ${fmtPct(execution)} de execução financeira.
+          <strong>${escHtml(focal)}</strong> tem ${rows.length} Sub-Outputs no filtro selecionado, com ${fmtMoney(total.avail)} USD disponíveis face a ${fmtMoney(total.req)} USD necessários (${Math.round(availableRate)}% de cobertura). A despesa reportada é ${fmtMoney(total.exp)} USD, equivalente a ${fmtPct(execution)} de execução financeira.
         </div>
         <div class="sup-note">
           <strong>Distribuição de execução:</strong><br>
-          ${high} Suboutputs com execução >= 70%<br>
-          ${mid} Suboutputs entre 35% e 69%<br>
-          ${low} Suboutputs abaixo de 35%
+          ${high} Sub-Outputs com execução >= 70%<br>
+          ${mid} Sub-Outputs entre 35% e 69%<br>
+          ${low} Sub-Outputs abaixo de 35%
         </div>
       </div>
     </div>
@@ -2323,11 +2323,11 @@ function buildFocalSupervisorReport(){
       <div class="sup-bars">${agencyHtml}</div>
     </div>
     <div class="sup-section">
-      <h2>Suboutputs com maior orçamento disponível</h2>
+      <h2>Sub-Outputs com maior orçamento disponível</h2>
       <div class="sup-bars">${topRows}</div>
     </div>
     <div class="sup-section">
-      <h2>Lista detalhada de Suboutputs</h2>
+      <h2>Lista detalhada de Sub-Outputs</h2>
       <table class="sup-table">
         <thead><tr><th>ID</th><th>Sub-Output</th><th>SP</th><th>Agência</th><th>Status</th><th class="num">Necessário</th><th class="num">Disponível</th><th class="num">Despesa</th><th class="num">% Despesa</th></tr></thead>
         <tbody>${tableRows}</tbody>
@@ -2381,15 +2381,15 @@ function buildAgencySupervisorReport(){
   const spRows=Object.entries(spMap).sort((a,b)=>a[0].localeCompare(b[0]));
   const period=yr==='all'?t('allYears'):yr, statusLabel=st==='all'?t('allStatus'):st, generated=new Date().toLocaleString('pt-PT');
   const tableRows=rows.map(r=>`<tr><td><strong>${escHtml(r.p.ID)}</strong></td><td>${escHtml(subOutputText(r.p).slice(0,135))}</td><td>${escHtml(shortSP(r.p["Strategic priority code"]))}</td><td>${escHtml(getFocalUsers(r.p).join(', ')||'—')}</td><td><span class="sup-status">${escHtml(r.p.Status||'—')}</span></td><td class="num">${agencyShareCell(r.req,r.totReq,r.shared)}</td><td class="num">${agencyShareCell(r.avail,r.totAvail,r.shared)}</td><td class="num">${agencyShareCell(r.exp,r.totExp,r.shared)}</td><td class="num">${fmtPct(r.pct)}</td></tr>`).join('');
-  const focalHtml=focalRows.map(([name,v])=>`<div class="sup-bar-row"><div class="sup-bar-head"><strong>${escHtml(name)}</strong><span>${fmtMoneyDash(v.avail)} USD disponível · ${fmtMoneyDash(v.exp)} USD despesa · ${v.count} Suboutputs</span></div><div class="sup-track"><span class="sup-fill" style="width:${Math.min(100,(v.avail/maxFocal)*100)}%"></span></div><div class="sup-track" style="margin-top:3px;"><span class="sup-fill exp" style="width:${Math.min(100,v.avail>0?(v.exp/v.avail)*100:0)}%"></span></div></div>`).join('');
+  const focalHtml=focalRows.map(([name,v])=>`<div class="sup-bar-row"><div class="sup-bar-head"><strong>${escHtml(name)}</strong><span>${fmtMoneyDash(v.avail)} USD disponível · ${fmtMoneyDash(v.exp)} USD despesa · ${v.count} Sub-Outputs</span></div><div class="sup-track"><span class="sup-fill" style="width:${Math.min(100,(v.avail/maxFocal)*100)}%"></span></div><div class="sup-track" style="margin-top:3px;"><span class="sup-fill exp" style="width:${Math.min(100,v.avail>0?(v.exp/v.avail)*100:0)}%"></span></div></div>`).join('');
   const spHtml=spRows.map(([name,v])=>`<div class="sup-bar-row"><div class="sup-bar-head"><strong>${escHtml(name)}</strong><span>${fmtMoneyDash(v.avail)} USD · ${fmtPct(v.avail>0?(v.exp/v.avail)*100:0)}</span></div><div class="sup-track"><span class="sup-fill exp" style="width:${Math.min(100,v.avail>0?(v.exp/v.avail)*100:0)}%"></span></div></div>`).join('');
   document.getElementById('focalSupervisorPrint').innerHTML=`
     <div class="sup-cover"><div><div class="sup-kicker">UN INFO Cabo Verde · Agency Brief</div><div class="sup-agency-name">${escHtml(agency)}</div><h1 class="sup-agency-subtitle">Relatório por Agência</h1></div><div class="sup-meta"><strong>Período:</strong> ${escHtml(period)}<br><strong>Status:</strong> ${escHtml(statusLabel)}<br>Gerado em: ${generated}</div></div>
-    <div class="sup-kpis"><div class="sup-kpi"><div class="sup-kpi-label">Suboutputs</div><div class="sup-kpi-value">${rows.length}</div></div><div class="sup-kpi"><div class="sup-kpi-label">${t('colReq')}</div><div class="sup-kpi-value">${fmtMoney(total.req)}</div></div><div class="sup-kpi"><div class="sup-kpi-label">${t('colAvail')}</div><div class="sup-kpi-value">${fmtMoney(total.avail)}</div></div><div class="sup-kpi"><div class="sup-kpi-label">${t('colExp')}</div><div class="sup-kpi-value">${fmtMoney(total.exp)}</div></div><div class="sup-kpi"><div class="sup-kpi-label">${t('reportExecution')}</div><div class="sup-kpi-value">${Math.round(execution)}%</div></div></div>
-    <div class="sup-section"><h2>Leitura executiva</h2><div class="sup-note">A agência <strong>${escHtml(agency)}</strong> concentra ${rows.length} Suboutputs no filtro selecionado, com ${fmtMoney(total.avail)} USD disponíveis e ${fmtMoney(total.exp)} USD de despesa reportada. A execução financeira global é ${fmtPct(execution)}.</div></div>
+    <div class="sup-kpis"><div class="sup-kpi"><div class="sup-kpi-label">Sub-Outputs</div><div class="sup-kpi-value">${rows.length}</div></div><div class="sup-kpi"><div class="sup-kpi-label">${t('colReq')}</div><div class="sup-kpi-value">${fmtMoney(total.req)}</div></div><div class="sup-kpi"><div class="sup-kpi-label">${t('colAvail')}</div><div class="sup-kpi-value">${fmtMoney(total.avail)}</div></div><div class="sup-kpi"><div class="sup-kpi-label">${t('colExp')}</div><div class="sup-kpi-value">${fmtMoney(total.exp)}</div></div><div class="sup-kpi"><div class="sup-kpi-label">${t('reportExecution')}</div><div class="sup-kpi-value">${Math.round(execution)}%</div></div></div>
+    <div class="sup-section"><h2>Leitura executiva</h2><div class="sup-note">A agência <strong>${escHtml(agency)}</strong> concentra ${rows.length} Sub-Outputs no filtro selecionado, com ${fmtMoney(total.avail)} USD disponíveis e ${fmtMoney(total.exp)} USD de despesa reportada. A execução financeira global é ${fmtPct(execution)}.</div></div>
     <div class="sup-section"><h2>Carteira por Focal Point / Grupo</h2><div class="sup-bars">${focalHtml}</div></div>
     <div class="sup-section"><h2>Execução por prioridade estratégica</h2><div class="sup-bars">${spHtml}</div></div>
-    <div class="sup-section"><h2>Lista detalhada de Suboutputs</h2><table class="sup-table"><thead><tr><th>ID</th><th>Sub-Output</th><th>SP</th><th>Focal Point</th><th>Status</th><th class="num">Necessário</th><th class="num">Disponível</th><th class="num">Despesa</th><th class="num">% Despesa</th></tr></thead><tbody>${tableRows}</tbody></table></div>
+    <div class="sup-section"><h2>Lista detalhada de Sub-Outputs</h2><table class="sup-table"><thead><tr><th>ID</th><th>Sub-Output</th><th>SP</th><th>Focal Point</th><th>Status</th><th class="num">Necessário</th><th class="num">Disponível</th><th class="num">Despesa</th><th class="num">% Despesa</th></tr></thead><tbody>${tableRows}</tbody></table></div>
     <div class="sup-footer">MY UN INFO · UNCF Cabo Verde 2023-2027 · Relatório preparado para supervisão</div>`;
   return true;
 }
@@ -2398,7 +2398,7 @@ document.getElementById('downloadAgencyBtn')?.addEventListener('click',printAgen
 
 function buildSuboutputReportingSheet(id){
   const p=PROJECTS_DATA.find(x=>String(x.ID)===String(id || document.getElementById('projectSelect')?.value));
-  if(!p){ alert('Selecione um Suboutput.'); return false; }
+  if(!p){ alert('Selecione um Sub-Output.'); return false; }
   const totalPct=p["Total available resources"]>0?(p["Total expenditure resources"]/p["Total available resources"])*100:0;
   const annual=[2023,2024,2025,2026].map(y=>({y,req:getY(p,y,'Required'),avail:getY(p,y,'Available'),exp:getY(p,y,'Expenditure'),narr:getNarr(p,y)}));
   const annualRows=annual.map(r=>`<tr><td><strong>${r.y}</strong></td><td class="num">${fmtMoneyDash(r.req)}</td><td class="num">${fmtMoneyDash(r.avail)}</td><td class="num">${fmtMoneyDash(r.exp)}</td><td class="num">${fmtPctDash(r.avail>0?(r.exp/r.avail)*100:0,r.avail)}</td><td>${escHtml((r.narr||'—').slice(0,300))}</td></tr>`).join('');
@@ -2407,8 +2407,8 @@ function buildSuboutputReportingSheet(id){
     ? narrativeRows.map(r=>`<div class="sup-note" style="margin-bottom:8px;"><strong>${r.y}</strong><br>${escHtml(r.narr)}</div>`).join('')
     : '<div class="sup-note">Sem narrativa registada.</div>';
   document.getElementById('focalSupervisorPrint').innerHTML=`
-    <div class="sup-cover"><div><div class="sup-kicker">UN INFO Cabo Verde · Suboutput Reporting Sheet</div><h1 class="sup-title">Ficha de Reporting do Suboutput</h1></div><div class="sup-meta"><strong>ID ${escHtml(p.ID)}</strong><br>${escHtml(p.Status||'—')} · ${escHtml(shortSP(p["Strategic priority code"]))}<br>Gerado em: ${new Date().toLocaleString('pt-PT')}</div></div>
-    <div class="sup-section"><h2>Resumo do Suboutput</h2><div class="sup-note"><strong>Sub-Output:</strong> ${escHtml(subOutputText(p))}<br><strong>Agência:</strong> ${escHtml(p["Agency abbreviations"]||p.Agencies||'—')}<br><strong>Focal Point:</strong> ${escHtml(getFocalUsers(p).join(', ')||'—')}<br><strong>Período:</strong> ${escHtml(p["Start date"]||'—')} a ${escHtml(p["End date"]||'—')}</div></div>
+    <div class="sup-cover"><div><div class="sup-kicker">UN INFO Cabo Verde · Sub-Output Reporting Sheet</div><h1 class="sup-title">Ficha de Reporting do Sub-Output</h1></div><div class="sup-meta"><strong>ID ${escHtml(p.ID)}</strong><br>${escHtml(p.Status||'—')} · ${escHtml(shortSP(p["Strategic priority code"]))}<br>Gerado em: ${new Date().toLocaleString('pt-PT')}</div></div>
+    <div class="sup-section"><h2>Resumo do Sub-Output</h2><div class="sup-note"><strong>Sub-Output:</strong> ${escHtml(subOutputText(p))}<br><strong>Agência:</strong> ${escHtml(p["Agency abbreviations"]||p.Agencies||'—')}<br><strong>Focal Point:</strong> ${escHtml(getFocalUsers(p).join(', ')||'—')}<br><strong>Período:</strong> ${escHtml(p["Start date"]||'—')} a ${escHtml(p["End date"]||'—')}</div></div>
     <div class="sup-kpis"><div class="sup-kpi"><div class="sup-kpi-label">${t('colReq')}</div><div class="sup-kpi-value">${fmtMoney(p["Total required resources"])}</div></div><div class="sup-kpi"><div class="sup-kpi-label">${t('colAvail')}</div><div class="sup-kpi-value">${fmtMoney(p["Total available resources"])}</div></div><div class="sup-kpi"><div class="sup-kpi-label">${t('colExp')}</div><div class="sup-kpi-value">${fmtMoney(p["Total expenditure resources"])}</div></div><div class="sup-kpi"><div class="sup-kpi-label">${t('reportExecution')}</div><div class="sup-kpi-value">${Math.round(totalPct)}%</div></div><div class="sup-kpi"><div class="sup-kpi-label">ODS</div><div class="sup-kpi-value">${getSDGList(p).length}</div></div></div>
     <div class="sup-section"><h2>Contribuições e parcerias</h2><div class="sup-note"><strong>ODS:</strong> ${escHtml(getSDGList(p).join('; ')||'—')}<br><strong>Parceiros de implementação:</strong> ${escHtml(splitMulti(p["Implementation partners"]).join('; ')||'—')}<br><strong>Doadores:</strong> ${escHtml(splitMulti(p["Contributing partners"]).join('; ')||'—')}</div></div>
     <div class="sup-section"><h2>Evolução anual e narrativa</h2><table class="sup-table"><thead><tr><th>Ano</th><th class="num">Necessário</th><th class="num">Disponível</th><th class="num">Despesa</th><th class="num">Execução</th><th>Narrativa</th></tr></thead><tbody>${annualRows}</tbody></table></div>
@@ -2462,21 +2462,21 @@ function buildUNCTAWPReport(){
   const high=data.filter(p=>{const a=getY(p,reportYear,'Available'),e=getY(p,reportYear,'Expenditure');return a>0&&(e/a)*100>=70;}).length;
   const mid=data.filter(p=>{const a=getY(p,reportYear,'Available'),e=getY(p,reportYear,'Expenditure'),pct=a>0?(e/a)*100:0;return pct>=35&&pct<70;}).length;
   const low=data.length-high-mid;
-  const agencyHtml=agencies.map(([name,v])=>`<div class="sup-bar-row"><div class="sup-bar-head"><strong>${escHtml(name)}</strong><span>${fmtMoneyDash(v.avail)} USD · ${v.count} Suboutputs</span></div><div class="sup-track"><span class="sup-fill" style="width:${Math.min(100,(v.avail/maxAgency)*100)}%"></span></div><div class="sup-track" style="margin-top:3px;"><span class="sup-fill exp" style="width:${Math.min(100,v.avail>0?(v.exp/v.avail)*100:0)}%"></span></div></div>`).join('');
-  const spHtml=spRows.map(([sp,v])=>`<div class="sup-bar-row"><div class="sup-bar-head"><strong>${escHtml(sp)}</strong><span>${v.count} Suboutputs · ${fmtMoneyDash(v.avail)} USD · ${fmtPctDash(v.avail>0?(v.exp/v.avail)*100:0,v.avail)}</span></div><div class="sup-track"><span class="sup-fill" style="width:${Math.min(100,v.req>0?(v.avail/v.req)*100:0)}%"></span></div><div class="sup-track" style="margin-top:3px;"><span class="sup-fill exp" style="width:${Math.min(100,v.avail>0?(v.exp/v.avail)*100:0)}%"></span></div></div>`).join('');
+  const agencyHtml=agencies.map(([name,v])=>`<div class="sup-bar-row"><div class="sup-bar-head"><strong>${escHtml(name)}</strong><span>${fmtMoneyDash(v.avail)} USD · ${v.count} Sub-Outputs</span></div><div class="sup-track"><span class="sup-fill" style="width:${Math.min(100,(v.avail/maxAgency)*100)}%"></span></div><div class="sup-track" style="margin-top:3px;"><span class="sup-fill exp" style="width:${Math.min(100,v.avail>0?(v.exp/v.avail)*100:0)}%"></span></div></div>`).join('');
+  const spHtml=spRows.map(([sp,v])=>`<div class="sup-bar-row"><div class="sup-bar-head"><strong>${escHtml(sp)}</strong><span>${v.count} Sub-Outputs · ${fmtMoneyDash(v.avail)} USD · ${fmtPctDash(v.avail>0?(v.exp/v.avail)*100:0,v.avail)}</span></div><div class="sup-track"><span class="sup-fill" style="width:${Math.min(100,v.req>0?(v.avail/v.req)*100:0)}%"></span></div><div class="sup-track" style="margin-top:3px;"><span class="sup-fill exp" style="width:${Math.min(100,v.avail>0?(v.exp/v.avail)*100:0)}%"></span></div></div>`).join('');
   const sdgHtml=sdgRows.map(v=>`<tr><td>${escHtml(v.label)}</td><td class="num">${v.count}</td><td class="num">${fmtMoneyDash(v.avail)}</td><td class="num">${fmtMoneyDash(v.exp)}</td><td class="num">${fmtPctDash(v.avail>0?(v.exp/v.avail)*100:0,v.avail)}</td></tr>`).join('');
   const topRows=data.slice().sort((a,b)=>getY(b,reportYear,'Available')-getY(a,reportYear,'Available')).map(p=>{
     const avail=getY(p,reportYear,'Available'), exp=getY(p,reportYear,'Expenditure'), pct=avail>0?(exp/avail)*100:0;
     return `<tr><td><strong>${escHtml(p.ID)}</strong></td><td>${escHtml(subOutputText(p).slice(0,120))}</td><td>${escHtml(shortSP(p["Strategic priority code"]))}</td><td>${escHtml(p["Agency abbreviations"]||p.Agencies||'—')}</td><td class="num">${fmtMoneyDash(avail)}</td><td class="num">${fmtPct(pct)}</td></tr>`;
   }).join('');
   document.getElementById('focalSupervisorPrint').innerHTML=`
-    <div class="sup-cover compact"><div><div class="sup-kicker">UN INFO Cabo Verde · UNCT AWP 2026 Brief</div><h1 class="sup-title">Resumo visual do AWP 2026</h1></div><div class="sup-meta"><strong>UNCF 2023-2027</strong><br>Base atual: 06/30/2026, 00:00:00 · ${total.count} Suboutputs AWP 2026<br>Gerado em: ${new Date().toLocaleString('pt-PT')}</div></div>
-    <div class="sup-kpis tight"><div class="sup-kpi"><div class="sup-kpi-label">Suboutputs 2026</div><div class="sup-kpi-value">${total.count}</div></div><div class="sup-kpi"><div class="sup-kpi-label">${t('colReq')}</div><div class="sup-kpi-value">${fmtMoney(total.req)}</div></div><div class="sup-kpi"><div class="sup-kpi-label">${t('colAvail')}</div><div class="sup-kpi-value">${fmtMoney(total.avail)}</div></div><div class="sup-kpi"><div class="sup-kpi-label">${t('colExp')}</div><div class="sup-kpi-value">${fmtMoney(total.exp)}</div></div><div class="sup-kpi"><div class="sup-kpi-label">${t('reportExecution')}</div><div class="sup-kpi-value">${Math.round(execution)}%</div></div></div>
-    <div class="sup-first-grid"><div class="sup-note hero"><strong>Leitura executiva AWP 2026</strong><br>O AWP 2026 contém <strong>${total.count} Suboutputs</strong>, com ${fmtMoney(total.avail)} USD disponíveis para ${fmtMoney(total.req)} USD necessários. A cobertura financeira é de <strong>${Math.round(coverage)}%</strong> e a despesa reportada é de <strong>${fmtMoney(total.exp)} USD</strong>, equivalente a <strong>${fmtPct(execution)}</strong> de execução.</div><div class="sup-note"><strong>Distribuição de execução</strong><div class="sup-dist"><div class="sup-dist-card"><strong>${high}</strong><span>>= 70%</span></div><div class="sup-dist-card"><strong>${mid}</strong><span>35% a 69%</span></div><div class="sup-dist-card"><strong>${low}</strong><span>< 35%</span></div></div></div></div>
+    <div class="sup-cover compact"><div><div class="sup-kicker">UN INFO Cabo Verde · UNCT AWP 2026 Brief</div><h1 class="sup-title">Resumo visual do AWP 2026</h1></div><div class="sup-meta"><strong>UNCF 2023-2027</strong><br>Base atual: 06/30/2026, 00:00:00 · ${total.count} Sub-Outputs AWP 2026<br>Gerado em: ${new Date().toLocaleString('pt-PT')}</div></div>
+    <div class="sup-kpis tight"><div class="sup-kpi"><div class="sup-kpi-label">Sub-Outputs 2026</div><div class="sup-kpi-value">${total.count}</div></div><div class="sup-kpi"><div class="sup-kpi-label">${t('colReq')}</div><div class="sup-kpi-value">${fmtMoney(total.req)}</div></div><div class="sup-kpi"><div class="sup-kpi-label">${t('colAvail')}</div><div class="sup-kpi-value">${fmtMoney(total.avail)}</div></div><div class="sup-kpi"><div class="sup-kpi-label">${t('colExp')}</div><div class="sup-kpi-value">${fmtMoney(total.exp)}</div></div><div class="sup-kpi"><div class="sup-kpi-label">${t('reportExecution')}</div><div class="sup-kpi-value">${Math.round(execution)}%</div></div></div>
+    <div class="sup-first-grid"><div class="sup-note hero"><strong>Leitura executiva AWP 2026</strong><br>O AWP 2026 contém <strong>${total.count} Sub-Outputs</strong>, com ${fmtMoney(total.avail)} USD disponíveis para ${fmtMoney(total.req)} USD necessários. A cobertura financeira é de <strong>${Math.round(coverage)}%</strong> e a despesa reportada é de <strong>${fmtMoney(total.exp)} USD</strong>, equivalente a <strong>${fmtPct(execution)}</strong> de execução.</div><div class="sup-note"><strong>Distribuição de execução</strong><div class="sup-dist"><div class="sup-dist-card"><strong>${high}</strong><span>>= 70%</span></div><div class="sup-dist-card"><strong>${mid}</strong><span>35% a 69%</span></div><div class="sup-dist-card"><strong>${low}</strong><span>< 35%</span></div></div></div></div>
     <div class="sup-two-col"><div class="sup-section compact"><h2>Top agências por verba disponível</h2><div class="sup-bars compact">${agencyFirstPageHtml}</div></div><div class="sup-section compact"><h2>Prioridades estratégicas</h2><div class="sup-bars compact">${spHtml}</div></div></div>
     <div class="sup-section sup-page-break"><h2>AWP 2026 por agência</h2><div class="sup-bars">${agencyHtml}</div></div>
-    <div class="sup-section"><h2>ODS por verba disponível em 2026</h2><table class="sup-table"><thead><tr><th>ODS</th><th class="num">Suboutputs</th><th class="num">Disponível</th><th class="num">Despesa</th><th class="num">Execução</th></tr></thead><tbody>${sdgHtml}</tbody></table></div>
-    <div class="sup-section"><h2>Todos os Suboutputs 2026</h2><table class="sup-table"><thead><tr><th>ID</th><th>Sub-Output</th><th>SP</th><th>Agência</th><th class="num">Disponível</th><th class="num">Execução</th></tr></thead><tbody>${topRows}</tbody></table></div>
+    <div class="sup-section"><h2>ODS por verba disponível em 2026</h2><table class="sup-table"><thead><tr><th>ODS</th><th class="num">Sub-Outputs</th><th class="num">Disponível</th><th class="num">Despesa</th><th class="num">Execução</th></tr></thead><tbody>${sdgHtml}</tbody></table></div>
+    <div class="sup-section"><h2>Todos os Sub-Outputs 2026</h2><table class="sup-table"><thead><tr><th>ID</th><th>Sub-Output</th><th>SP</th><th>Agência</th><th class="num">Disponível</th><th class="num">Execução</th></tr></thead><tbody>${topRows}</tbody></table></div>
     <div class="sup-footer">MY UN INFO · UNCF Cabo Verde 2023-2027 · Resumo UNCT/AWP 2026 preparado para supervisão</div>`;
   return true;
 }
